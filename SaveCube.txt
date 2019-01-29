@@ -1,0 +1,121 @@
+using UnityEngine;
+
+public class SaveCube : MonoBehaviour
+{
+  private Vector3 savepos = new Vector3(0.0f, 0.0f, 0.0f);
+  private bool saveflag = false;
+  private bool save = false;
+  private int i;
+  private int j;
+  private string savetext;
+  public int savescene;
+  public GameObject Player;
+  private WeponList weponhave;
+  private ItemList itemlis;
+  private WeponMenu weponlis;
+  private PartyStetus PTste;
+  private MenuOpen menu;
+  private SkillMenu PTskills;
+  private ScrollController subquest;
+
+  private void Start()
+  {
+    this.PTste = GameObject.Find("GameManager").GetComponent<PartyStetus>();
+    this.menu = GameObject.Find("GameManager").GetComponent<MenuOpen>();
+    this.weponhave = GameObject.Find("GameManager").GetComponent<WeponList>();
+    this.itemlis = GameObject.Find("GameManager").GetComponent<ItemList>();
+    this.weponlis = GameObject.Find("GameManager").GetComponent<WeponMenu>();
+    this.PTskills = GameObject.Find("GameManager").GetComponent<SkillMenu>();
+    this.subquest = GameObject.Find("GameManager").GetComponent<ScrollController>();
+  }
+
+  private void OnTriggerEnter(Collider other)
+  {
+    if (!(other.tag == "Player") || this.menu.talkflag)
+      return;
+    this.saveflag = true;
+    this.savetext = "ÉZÅ[ÉuÇ∑ÇÈ?";
+  }
+
+  private void OnGUI()
+  {
+    if (!this.saveflag || this.menu.menuID != 0 || this.menu.talkflag || !GUI.Button(new Rect(140f, 100f, 100f, 50f), this.savetext) && !Input.GetButtonDown("Fire3"))
+      return;
+    this.save = true;
+    this.savepos.x = this.Player.transform.position.x;
+    this.savepos.y = this.Player.transform.position.y;
+    this.savepos.z = this.Player.transform.position.z;
+    this.Save();
+  }
+
+  private void OnTriggerExit(Collider other)
+  {
+    this.save = false;
+    this.saveflag = false;
+  }
+
+  public void Save()
+  {
+    if (!this.save)
+      return;
+    this.menu.talkflag = true;
+    PlayerPrefs.SetInt("Load", 1);
+    PlayerPrefs.SetInt("money", this.menu.money);
+    PlayerPrefs.SetInt("Story", this.menu.story);
+    PlayerPrefs.SetFloat("savepos_x", this.savepos.x);
+    PlayerPrefs.SetFloat("savepos_y", this.savepos.y);
+    PlayerPrefs.SetFloat("savepos_z", this.savepos.z);
+    PlayerPrefs.SetFloat("Drivefall", this.PTste.Drivegage);
+    for (this.i = 0; this.i < 4; ++this.i)
+    {
+      PlayerPrefs.SetInt("atkaction[" + (object) this.i + "]", this.PTskills.setskill_atk[this.i]);
+      PlayerPrefs.SetInt("defaction[" + (object) this.i + "]", this.PTskills.setskill_def[this.i]);
+      PlayerPrefs.SetInt("enhaction[" + (object) this.i + "]", this.PTskills.setskill_enh[this.i]);
+      PlayerPrefs.SetInt("jamaction[" + (object) this.i + "]", this.PTskills.setskill_jam[this.i]);
+      for (int index = 0; index < 4; ++index)
+      {
+        for (this.j = 0; this.j < 19; ++this.j)
+          PlayerPrefs.SetInt("SkillLean_bool " + (object) this.i + "_" + (object) index + "_" + (object) this.j, this.PTskills.Skilllean_bool[this.i, index, this.j]);
+      }
+      PlayerPrefs.SetInt("NeedEXP_" + (object) this.i, this.PTste.partystatus[this.i].haveexp);
+      PlayerPrefs.SetInt("_level" + (object) this.i, this.PTste.partystatus[this.i].level);
+      PlayerPrefs.SetInt("SetWepon" + (object) this.i, this.weponlis.setID[this.i]);
+      if (this.menu.charpartyflag[this.i])
+      {
+        this.PTste.partystatus[this.i].HP = this.PTste.partystatus[this.i].MP = 9999;
+        PlayerPrefs.SetInt("Datakey[" + (object) this.i + "]", 1);
+      }
+      else
+        PlayerPrefs.SetInt("Datakey[" + (object) this.i + "]", 0);
+      PlayerPrefs.SetInt("PTSetacse_ID" + (object) this.i, this.weponlis.setID[this.i]);
+      PlayerPrefs.SetInt("Skillpoint" + (object) this.i, this.PTskills.skillpoint[this.i]);
+    }
+    PlayerPrefs.SetInt("SaveScene", this.savescene);
+    for (this.i = 0; this.i < 44; ++this.i)
+    {
+      PlayerPrefs.SetInt("Itemhave_con_[" + (object) this.i + "]", this.itemlis.itemhave_con[this.i]);
+      PlayerPrefs.SetInt("Itemhave_mat_[" + (object) this.i + "]", this.itemlis.itemhave_mat[this.i]);
+      PlayerPrefs.SetInt("Itemhave_imp_[" + (object) this.i + "]", this.itemlis.itemhave_imp[this.i]);
+      PlayerPrefs.SetInt("Accse_have_" + (object) this.i, this.weponhave.acsehave[this.i]);
+    }
+    for (this.i = 0; this.i < 16; ++this.i)
+    {
+      PlayerPrefs.SetInt("Questcout" + (object) this.i, this.subquest.Qest_clearcount[this.i]);
+      if (this.subquest.QestClearflag[this.i])
+        PlayerPrefs.SetInt("QuestClearflag" + (object) this.i, 1);
+    }
+    if (this.menu.warpflag_)
+    {
+      PlayerPrefs.SetInt("Warpflag", 1);
+      PlayerPrefs.SetFloat("warp_pos_x", this.menu.areawarp.x);
+      PlayerPrefs.SetFloat("warp_pos_y", this.menu.areawarp.y);
+      PlayerPrefs.SetFloat("warp_pos_z", this.menu.areawarp.z);
+    }
+    else
+      PlayerPrefs.SetInt("Warpflag", 0);
+    PlayerPrefs.Save();
+    this.menu.talkflag = false;
+    this.save = false;
+    this.saveflag = false;
+  }
+}

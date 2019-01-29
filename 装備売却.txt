@@ -1,0 +1,348 @@
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
+
+public class Acsesarrybuy : MonoBehaviour
+{
+  private int i = 0;
+  public int destroyset = 0;
+  private int buyid = 0;
+  private int shopmode = 0;
+  private int nowshopID = 0;
+  private int t = 0;
+  private ShopItemList items;
+  public RectTransform prefab;
+  public Text syopman;
+  public Text Acsesarry_stetas;
+  public Text Acsesarry_Text;
+  public Text nouwmoney;
+  public Text kosu;
+  public RectTransform contant;
+  private GameObject _child;
+  private int sellset;
+  private int buymoney;
+  private int kosuu;
+  private int shopcount;
+  private int nowno;
+  private int nowbuy;
+  private WeponList weponlis;
+  private ItemList itemlis;
+  private MenuOpen menu;
+
+  private void Start()
+  {
+    this.items = GameObject.Find("gouseiya").GetComponent<Mevanicshop>().shopitem;
+    this.weponlis = GameObject.Find("GameManager").GetComponent<WeponList>();
+    this.menu = GameObject.Find("GameManager").GetComponent<MenuOpen>();
+    this.itemlis = GameObject.Find("GameManager").GetComponent<ItemList>();
+    this.kosu.text = "0";
+    this.buyid = 0;
+    this.shopmode = 0;
+    this.nowshopID = -1;
+    this.ShopMode(0);
+    this.destroyset = 1;
+  }
+
+  private void Update()
+  {
+    this.nouwmoney.text = "所持金:" + (object) this.menu.money;
+    this.Key_();
+    this.ShopText();
+    this.nowshopID = this.shopmode;
+    if (this.shopmode == 0)
+      this.buyid = Mathf.Clamp(this.buyid, 0, this.items.itemID_acs.Length - 1);
+    if (this.shopmode == 1)
+      this.buyid = Mathf.Clamp(this.buyid, 0, this.items.itemID_con.Length - 1);
+    if (this.shopmode == 2)
+      this.buyid = Mathf.Clamp(this.buyid, 0, this.items.itemID_mate.Length - 1);
+    this.kosuu = Mathf.Clamp(this.kosuu, 0, 99);
+    this.kosu.text = this.kosuu.ToString();
+  }
+
+  public void Key_()
+  {
+    ++this.t;
+    if (this.t < 20)
+      return;
+    if (this.shopcount == 0)
+    {
+      if (Input.GetButtonDown("Fire5"))
+      {
+        this.t = 0;
+        if (this.shopmode > 0)
+        {
+          this.buyid = 0;
+          --this.shopmode;
+          this.ShopMode(this.shopmode + 1);
+        }
+      }
+      else if (Input.GetButtonDown("Fire6"))
+      {
+        this.t = 0;
+        if (this.shopmode < 2)
+        {
+          this.buyid = 0;
+          ++this.shopmode;
+          this.ShopMode(this.shopmode - 1);
+        }
+      }
+      if ((double) Input.GetAxis("Vertical") > 0.0)
+      {
+        this.t = 0;
+        if (this.buyid > 0)
+        {
+          --this.buyid;
+          this.sellset = 1;
+        }
+      }
+      if ((double) Input.GetAxis("Vertical") < 0.0)
+      {
+        this.t = 0;
+        if (this.shopmode == 0)
+        {
+          if (this.buyid < this.items.itemID_acs.Length - 1)
+          {
+            ++this.buyid;
+            this.sellset = 1;
+          }
+        }
+        else if (this.shopmode == 1)
+        {
+          if (this.buyid < this.items.itemID_con.Length - 1)
+          {
+            ++this.buyid;
+            this.sellset = 1;
+          }
+        }
+        else if (this.shopmode == 2 && this.buyid < this.items.itemID_mate.Length - 1)
+        {
+          ++this.buyid;
+          this.sellset = 1;
+        }
+      }
+      else
+        this.kosuu = 1;
+      if (Input.GetButtonDown("Fire3"))
+        ++this.shopcount;
+    }
+    else if (this.shopcount == 1)
+    {
+      if ((double) Input.GetAxis("Vertical") > 0.0)
+      {
+        this.t = 0;
+        if (this.kosuu < 99)
+          this.Buykazuchange(1);
+      }
+      else if ((double) Input.GetAxis("Vertical") < 0.0)
+      {
+        this.t = 0;
+        if (this.kosuu > 0)
+          this.Buykazuchange(-1);
+      }
+      if (Input.GetButtonDown("Fire3"))
+      {
+        this.t = 0;
+        this.Buy();
+        this.shopcount = 0;
+      }
+    }
+  }
+
+  public void Buykazuchange(int changer)
+  {
+    this.kosuu += changer;
+    this.sellset = 1;
+  }
+
+  public void ShopText()
+  {
+    if (this.shopmode == 0)
+    {
+      this.buymoney = this.weponlis.acsvalue[this.items.itemID_acs[this.buyid]];
+      this.Acsesarry_Text.text = "" + this.weponlis.acs_text[this.items.itemID_acs[this.buyid]] + "\n￥" + (object) this.weponlis.acsvalue[this.items.itemID_acs[this.buyid]];
+      this.Acsesarry_stetas.text = this.weponlis.acsename[this.items.itemID_acs[this.buyid]] + "\nHP:+" + (object) this.weponlis.acs_upHP[this.items.itemID_acs[this.buyid]] + "\nMP:+" + (object) this.weponlis.acs_upMP[this.items.itemID_acs[this.buyid]] + "\n攻撃力:+" + (object) this.weponlis.acs_upower[this.items.itemID_acs[this.buyid]] + "\n防御力:+" + (object) this.weponlis.acs_updeff[this.items.itemID_acs[this.buyid]] + "\n精神力:+" + (object) this.weponlis.acs_upINT[this.items.itemID_acs[this.buyid]] + "\n敏捷度:+" + (object) this.weponlis.acs_updex[this.items.itemID_acs[this.buyid]];
+    }
+    else
+    {
+      if (this.shopmode == 1)
+      {
+        this.buymoney = this.itemlis.itemvalue_con[this.items.itemID_con[this.buyid]] * this.kosuu;
+        this.Acsesarry_Text.text = "" + this.itemlis.itemtext_con[this.items.itemID_con[this.buyid]] + "\n￥" + (object) this.buymoney;
+        this.Acsesarry_stetas.text = this.itemlis.itemname_con[this.items.itemID_con[this.buyid]] + "\n所持数 " + (object) this.itemlis.itemhave_con[this.items.itemID_con[this.buyid]];
+      }
+      if (this.shopmode == 2)
+      {
+        this.buymoney = this.itemlis.itemvalue_mat[this.items.itemID_mate[this.buyid]] * this.kosuu;
+        this.Acsesarry_Text.text = "" + this.itemlis.itemtext_mat[this.items.itemID_mate[this.buyid]] + "\n￥" + (object) this.buymoney;
+        this.Acsesarry_stetas.text = this.itemlis.itemname_mat[this.items.itemID_mate[this.buyid]] + "\n所持数 " + (object) this.itemlis.itemhave_mat[this.items.itemID_mate[this.buyid]];
+      }
+    }
+  }
+
+  public void OnClick(int num)
+  {
+    this.buyid = num;
+    this.shopcount = 1;
+  }
+
+  public void Buy()
+  {
+    if (this.sellset != 1)
+      return;
+    if (this.shopmode == 0)
+    {
+      if (this.weponlis.acsehave[this.items.itemID_acs[this.buyid]] > 0)
+      {
+        this.syopman.text = "もう持ってるね";
+        this.sellset = 0;
+      }
+      else if (this.menu.money >= this.buymoney)
+      {
+        this.weponlis.acsehave[this.items.itemID_acs[this.buyid]] = 1;
+        this.menu.money -= this.buymoney;
+        this.syopman.text = "毎度あり！";
+        this.sellset = 2;
+      }
+      else
+      {
+        this.syopman.text = "お金が足りないよ";
+        this.sellset = 0;
+      }
+    }
+    else
+    {
+      if (this.shopmode == 1)
+      {
+        if (this.menu.money >= this.buymoney)
+        {
+          this.itemlis.itemhave_con[this.items.itemID_con[this.buyid]] += this.kosuu;
+          this.menu.money -= this.buymoney;
+          this.syopman.text = "毎度あり！";
+          this.sellset = 2;
+        }
+        else
+        {
+          this.syopman.text = "お金が足りないよ";
+          this.sellset = 0;
+        }
+      }
+      if (this.shopmode == 2)
+      {
+        if (this.menu.money >= this.buymoney)
+        {
+          this.itemlis.itemhave_mat[this.items.itemID_mate[this.buyid]] += this.kosuu;
+          this.menu.money -= this.buymoney;
+          this.syopman.text = "毎度あり！";
+          this.sellset = 2;
+        }
+        else
+        {
+          this.syopman.text = "お金が足りないよ";
+          this.sellset = 0;
+        }
+      }
+    }
+  }
+
+  public void ShopMode_Click(int nexshopID)
+  {
+    this.buyid = 0;
+    if (this.nowshopID == 0)
+    {
+      for (this.i = 0; this.i < this.items.itemID_acs.Length; ++this.i)
+      {
+        this._child = this.transform.Find("Contant" + (object) this.i).gameObject;
+        Object.Destroy((Object) this._child.gameObject);
+      }
+    }
+    else if (this.nowshopID == 1)
+    {
+      for (this.i = 0; this.i < this.items.itemID_con.Length; ++this.i)
+      {
+        this._child = this.transform.Find("Contant" + (object) this.i).gameObject;
+        Object.Destroy((Object) this._child.gameObject);
+      }
+    }
+    else if (this.nowshopID == 2)
+    {
+      for (this.i = 0; this.i < this.items.itemID_mate.Length; ++this.i)
+      {
+        this._child = this.transform.Find("Contant" + (object) this.i).gameObject;
+        Object.Destroy((Object) this._child.gameObject);
+      }
+    }
+    this.shopmode = this.nowshopID = nexshopID;
+    this.ContainGenerat();
+  }
+
+  public void ShopMode(int fromID)
+  {
+    if (this.destroyset == 1)
+    {
+      switch (fromID)
+      {
+        case 0:
+          for (int index = 0; index < this.items.itemID_acs.Length; ++index)
+          {
+            this._child = this.transform.Find("Contant" + (object) index).gameObject;
+            Object.Destroy((Object) this._child.gameObject);
+          }
+          break;
+        case 1:
+          for (int index = 0; index < this.items.itemID_con.Length; ++index)
+          {
+            this._child = this.transform.Find("Contant" + (object) index).gameObject;
+            Object.Destroy((Object) this._child.gameObject);
+          }
+          break;
+        case 2:
+          for (int index = 0; index < this.items.itemID_mate.Length; ++index)
+          {
+            this._child = this.transform.Find("Contant" + (object) index).gameObject;
+            Object.Destroy((Object) this._child.gameObject);
+          }
+          break;
+      }
+    }
+    this.ContainGenerat();
+  }
+
+  public void ContainGenerat()
+  {
+    if (this.shopmode == 0)
+    {
+      for (this.i = 0; this.i < this.items.itemID_acs.Length; ++this.i)
+      {
+        int no = this.i;
+        RectTransform rectTransform = Object.Instantiate<RectTransform>(this.prefab);
+        rectTransform.name = "Contant" + (object) this.i;
+        rectTransform.SetParent(this.transform, false);
+        rectTransform.GetComponentInChildren<Text>().text = "" + this.weponlis.acsename[this.items.itemID_acs[this.i]];
+        rectTransform.GetComponent<Button>().onClick.AddListener((UnityAction) (() => this.OnClick(no)));
+      }
+    }
+    if (this.shopmode == 1)
+    {
+      for (this.i = 0; this.i < this.items.itemID_con.Length; ++this.i)
+      {
+        int no = this.i;
+        RectTransform rectTransform = Object.Instantiate<RectTransform>(this.prefab);
+        rectTransform.name = "Contant" + (object) this.i;
+        rectTransform.SetParent(this.transform, false);
+        rectTransform.GetComponentInChildren<Text>().text = "" + this.itemlis.itemname_con[this.items.itemID_con[this.i]];
+        rectTransform.GetComponent<Button>().onClick.AddListener((UnityAction) (() => this.OnClick(no)));
+      }
+    }
+    if (this.shopmode != 2)
+      return;
+    for (this.i = 0; this.i < this.items.itemID_mate.Length; ++this.i)
+    {
+      int no = this.i;
+      RectTransform rectTransform = Object.Instantiate<RectTransform>(this.prefab);
+      rectTransform.name = "Contant" + (object) this.i;
+      rectTransform.SetParent(this.transform, false);
+      rectTransform.GetComponentInChildren<Text>().text = "" + this.itemlis.itemname_mat[this.items.itemID_mate[this.i]];
+      rectTransform.GetComponent<Button>().onClick.AddListener((UnityAction) (() => this.OnClick(no)));
+    }
+  }
+}

@@ -1,0 +1,287 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class GouseiMode : MonoBehaviour
+{
+  private int t = 0;
+  private int selectchar = 0;
+  private int[] needitemnum = new int[6]{ 2, 3, 4, 5, 6, 7 };
+  private int i;
+  private int sozaicount;
+  public Text WeponSetName;
+  public Text WeponNextName;
+  public Text sozai;
+  public Text nowmoney;
+  public Text syopman;
+  public Text money;
+  private MenuOpen menu;
+  private WeponList weponlis;
+  private WeponMenu weponmenu;
+  private ItemList itemlis;
+  private int weponmode;
+
+  private void Start()
+  {
+    this.menu = GameObject.Find("GameManager").GetComponent<MenuOpen>();
+    this.weponlis = GameObject.Find("GameManager").GetComponent<WeponList>();
+    this.weponmenu = GameObject.Find("GameManager").GetComponent<WeponMenu>();
+    this.itemlis = GameObject.Find("GameManager").GetComponent<ItemList>();
+  }
+
+  private void Update()
+  {
+    ++this.t;
+    this.Key_();
+    this.nowmoney.text = "èäéùã‡" + (object) this.menu.money;
+    if (this.weponmode == 0)
+    {
+      if (this.weponmenu.nowID[0] >= 5)
+      {
+        this.WeponSetName.text = "Ç±ÇÍà»è„ã≠âªÇ≈Ç´Ç‹ÇπÇÒ";
+        this.WeponNextName.text = "";
+      }
+      else
+      {
+        this.WeponSetName.text = "" + this.weponlis.nih_name[this.weponmenu.nowID[0]];
+        this.WeponNextName.text = "" + this.weponlis.nih_name[this.weponmenu.nowID[0] + 1];
+      }
+    }
+    if (this.weponmode == 1)
+    {
+      if (this.weponmenu.nowID[1] >= 5)
+      {
+        this.WeponSetName.text = "Ç±ÇÍà»è„ã≠âªÇ≈Ç´Ç‹ÇπÇÒ";
+        this.WeponNextName.text = "";
+      }
+      else
+      {
+        this.WeponSetName.text = "" + this.weponlis.sword_name[this.weponmenu.nowID[1]];
+        this.WeponNextName.text = "" + this.weponlis.sword_name[this.weponmenu.nowID[1] + 1];
+      }
+    }
+    if (this.weponmode == 2)
+    {
+      if (this.weponmenu.nowID[2] >= 5)
+      {
+        this.WeponSetName.text = "Ç±ÇÍà»è„ã≠âªÇ≈Ç´Ç‹ÇπÇÒ";
+        this.WeponNextName.text = "";
+      }
+      else
+      {
+        this.WeponSetName.text = "" + this.weponlis.staff_name[this.weponmenu.nowID[2]];
+        this.WeponNextName.text = "" + this.weponlis.staff_name[this.weponmenu.nowID[2] + 1];
+      }
+    }
+    if (this.weponmode == 3)
+    {
+      if (this.weponmenu.nowID[3] >= 5)
+      {
+        this.WeponSetName.text = "Ç±ÇÍà»è„ã≠âªÇ≈Ç´Ç‹ÇπÇÒ";
+        this.WeponNextName.text = "";
+      }
+      else
+      {
+        this.WeponSetName.text = "" + this.weponlis.gun_name[this.weponmenu.nowID[3]];
+        this.WeponNextName.text = "" + this.weponlis.gun_name[this.weponmenu.nowID[3] + 1];
+      }
+    }
+    if (this.weponmenu.nowID[this.weponmode] < 5)
+      this.money.text = "óøã‡: " + (object) this.weponlis.needmoney[this.weponmenu.nowID[this.weponmode]];
+    else
+      this.money.text = "";
+  }
+
+  public void Key_()
+  {
+    if (this.t < 50)
+      return;
+    if (Input.GetButtonDown("Fire5"))
+    {
+      this.t = 0;
+      if (this.selectchar > 0)
+        --this.selectchar;
+      this.OnClick(this.selectchar);
+    }
+    else if (Input.GetButtonDown("Fire6"))
+    {
+      this.t = 0;
+      if (this.selectchar < 4)
+        ++this.selectchar;
+      this.OnClick(this.selectchar);
+    }
+    else if (Input.GetButtonDown("Fire3"))
+      this.Gousei();
+  }
+
+  public void OnClick(int no)
+  {
+    this.sozai.text = "";
+    this.weponmode = no;
+    if (this.weponmode == 0)
+    {
+      for (this.i = 0; this.weponlis.material_nih[this.weponmenu.nowID[0], this.i] != -1; ++this.i)
+      {
+        Text sozai = this.sozai;
+        sozai.text = sozai.text + "\n" + this.itemlis.itemname_mat[this.weponlis.material_nih[this.weponmenu.nowID[0], this.i]] + "/" + (object) this.itemlis.itemhave_mat[this.weponlis.material_nih[this.weponmenu.nowID[0], this.i]] + "  Å~30";
+      }
+    }
+    if (this.weponmode == 1)
+    {
+      for (this.i = 0; this.weponlis.material_katana[this.weponmenu.nowID[1], this.i] < this.needitemnum[this.weponmenu.nowID[1]]; ++this.i)
+      {
+        Text sozai = this.sozai;
+        sozai.text = sozai.text + "\n" + this.itemlis.itemname_mat[this.weponlis.material_katana[this.weponmenu.nowID[1], this.i]] + "/" + (object) this.itemlis.itemhave_mat[this.weponlis.material_katana[this.weponmenu.nowID[1], this.i]] + " Å~30";
+      }
+    }
+    if (this.weponmode == 2)
+    {
+      for (this.i = 0; this.weponlis.material_orv[this.weponmenu.nowID[2], this.i] < this.needitemnum[this.weponmenu.nowID[2]]; ++this.i)
+      {
+        Text sozai = this.sozai;
+        sozai.text = sozai.text + "\n" + this.itemlis.itemname_mat[this.weponlis.material_orv[this.weponmenu.nowID[2], this.i]] + "/" + (object) this.itemlis.itemhave_mat[this.weponlis.material_orv[this.weponmenu.nowID[2], this.i]] + "  Å~30";
+      }
+    }
+    if (this.weponmode != 3)
+      return;
+    for (this.i = 0; this.weponlis.material_yumi[this.weponmenu.nowID[3], this.i] < this.needitemnum[this.weponmenu.nowID[3]]; ++this.i)
+    {
+      Text sozai = this.sozai;
+      sozai.text = sozai.text + "\n" + this.itemlis.itemname_mat[this.weponlis.material_yumi[this.weponmenu.nowID[3], this.i]] + "/" + (object) this.itemlis.itemhave_mat[this.weponlis.material_yumi[this.weponmenu.nowID[3], this.i]] + "  Å~30";
+    }
+  }
+
+  public void Gousei()
+  {
+    if (this.weponmode == 0)
+    {
+      for (this.i = 0; this.weponlis.material_nih[this.weponmenu.nowID[0], this.i] != -1; ++this.i)
+      {
+        if (this.itemlis.itemhave_mat[this.weponlis.material_nih[this.weponmenu.nowID[0], this.i]] >= 30)
+          ++this.sozaicount;
+      }
+      if (this.sozaicount >= this.needitemnum[this.weponmenu.nowID[0]])
+      {
+        if (this.menu.money >= this.weponlis.needmoney[this.weponmenu.nowID[0]])
+        {
+          for (this.i = 0; this.weponlis.material_nih[this.weponmenu.nowID[0], this.i] != -1; ++this.i)
+          {
+            this.itemlis.itemhave_mat[this.weponlis.material_nih[this.weponmenu.nowID[0], this.i]] -= 30;
+            this.syopman.text = "çáê¨Ç…ê¨å˜ÇµÇ‹ÇµÇΩÅI";
+            this.sozaicount = 0;
+          }
+          this.menu.money -= this.weponlis.needmoney[this.weponmenu.nowID[0]];
+          ++this.weponmenu.nowID[this.weponmode];
+          this.OnClick(0);
+        }
+        else
+        {
+          this.syopman.text = "Ç®Ç‚ÅHÇ®ã‡Ç™ë´ÇËÇ‹ÇπÇÒÇÊ";
+          this.sozaicount = 0;
+        }
+      }
+      else
+      {
+        this.syopman.text = "Ç®Ç‚ÅHëfçﬁÇ™ë´ÇËÇ‹ÇπÇÒÇÊ";
+        this.sozaicount = 0;
+      }
+    }
+    if (this.weponmode == 1)
+    {
+      for (this.i = 0; this.weponlis.material_katana[this.weponmenu.nowID[1], this.i] != -1; ++this.i)
+      {
+        if (this.itemlis.itemhave_mat[this.weponlis.material_katana[this.weponmenu.nowID[1], this.i]] >= 30)
+          ++this.sozaicount;
+      }
+      if (this.sozaicount >= this.needitemnum[this.weponmenu.nowID[1]])
+      {
+        if (this.menu.money >= this.weponlis.needmoney[this.weponmenu.nowID[1]])
+        {
+          for (this.i = 0; this.weponlis.material_katana[this.weponmenu.nowID[1], this.i] != -1; ++this.i)
+          {
+            this.itemlis.itemhave_mat[this.weponlis.material_katana[this.weponmenu.nowID[1], this.i]] -= 30;
+            this.syopman.text = "çáê¨Ç…ê¨å˜ÇµÇ‹ÇµÇΩÅI";
+            this.sozaicount = 0;
+          }
+          this.menu.money -= this.weponlis.needmoney[this.weponmenu.setID[1]];
+          ++this.weponmenu.nowID[1];
+          this.OnClick(1);
+        }
+        else
+        {
+          this.syopman.text = "Ç®Ç‚ÅHÇ®ã‡Ç™ë´ÇËÇ‹ÇπÇÒÇÊ";
+          this.sozaicount = 0;
+        }
+      }
+      else
+      {
+        this.syopman.text = "Ç®Ç‚ÅHëfçﬁÇ™ë´ÇËÇ‹ÇπÇÒÇÊ";
+        this.sozaicount = 0;
+      }
+    }
+    if (this.weponmode == 2)
+    {
+      for (this.i = 0; this.weponlis.material_orv[this.weponmenu.nowID[2], this.i] != -1; ++this.i)
+      {
+        if (this.itemlis.itemhave_mat[this.weponlis.material_orv[this.weponmenu.nowID[2], this.i]] >= 30)
+          ++this.sozaicount;
+      }
+      if (this.sozaicount >= this.needitemnum[this.weponmenu.nowID[2]])
+      {
+        if (this.menu.money >= this.weponlis.needmoney[this.weponmenu.nowID[2]])
+        {
+          for (this.i = 0; this.weponlis.material_orv[this.weponmenu.nowID[2], this.i] != -1; ++this.i)
+          {
+            this.itemlis.itemhave_mat[this.weponlis.material_orv[2, this.i]] -= 30;
+            this.syopman.text = "çáê¨Ç…ê¨å˜ÇµÇ‹ÇµÇΩÅI";
+            this.sozaicount = 0;
+          }
+          this.menu.money -= this.weponlis.needmoney[this.weponmenu.nowID[2]];
+          ++this.weponmenu.nowID[this.weponmode];
+          this.OnClick(2);
+        }
+        else
+        {
+          this.syopman.text = "Ç®Ç‚ÅHÇ®ã‡Ç™ë´ÇËÇ‹ÇπÇÒÇÊ";
+          this.sozaicount = 0;
+        }
+      }
+      else
+      {
+        this.syopman.text = "Ç®Ç‚ÅHëfçﬁÇ™ë´ÇËÇ‹ÇπÇÒÇÊ";
+        this.sozaicount = 0;
+      }
+    }
+    if (this.weponmode != 3)
+      return;
+    for (this.i = 0; this.weponlis.material_yumi[this.weponmenu.nowID[3], this.i] != -1; ++this.i)
+    {
+      if (this.itemlis.itemhave_mat[this.weponlis.material_yumi[this.weponmenu.nowID[3], this.i]] >= 30)
+        ++this.sozaicount;
+    }
+    if (this.sozaicount >= this.needitemnum[this.weponmenu.nowID[3]])
+    {
+      if (this.menu.money >= this.weponlis.needmoney[this.weponmenu.nowID[3]])
+      {
+        for (this.i = 0; this.weponlis.material_yumi[this.weponmenu.nowID[3], this.i] != -1; ++this.i)
+        {
+          this.itemlis.itemhave_mat[this.weponlis.material_yumi[this.weponmenu.nowID[3], this.i]] -= 30;
+          this.syopman.text = "çáê¨Ç…ê¨å˜ÇµÇ‹ÇµÇΩÅI";
+          this.sozaicount = 0;
+        }
+        this.menu.money -= this.weponlis.needmoney[this.weponmenu.nowID[3]];
+        ++this.weponmenu.nowID[3];
+        this.OnClick(3);
+      }
+      else
+      {
+        this.syopman.text = "Ç®Ç‚ÅHÇ®ã‡Ç™ë´ÇËÇ‹ÇπÇÒÇÊ";
+        this.sozaicount = 0;
+      }
+    }
+    else
+    {
+      this.syopman.text = "Ç®Ç‚ÅHëfçﬁÇ™ë´ÇËÇ‹ÇπÇÒÇÊ";
+      this.sozaicount = 0;
+    }
+  }
+}

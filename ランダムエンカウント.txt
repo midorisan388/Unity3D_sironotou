@@ -1,0 +1,52 @@
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class EncountRandom : MonoBehaviour
+{
+  private int i;
+  public int Encoutgroup;
+  [SerializeField]
+  public EnemyStetus[] groups;
+  private GameObject Position;
+  private int battle;
+  public int returnscene_send;
+  public int battlescene;
+  private EncountDate encountgroup;
+  private PlayerMove plymove;
+  private MenuOpen menu;
+  public GameObject Camera;
+  public GameObject Player;
+  private Vector3 nowtransform;
+  private StartPosition startpos;
+
+  private void Start()
+  {
+    this.Position = GameObject.Find("GameManager");
+    this.menu = this.Position.GetComponent<MenuOpen>();
+    this.nowtransform = this.Player.transform.position;
+    this.Player.transform.position = this.nowtransform;
+    this.encountgroup = GameObject.Find("GameManager").GetComponent<EncountDate>();
+    this.startpos = this.Position.GetComponent<StartPosition>();
+  }
+
+  private void OnTriggerStay(Collider mycol)
+  {
+    if (!(mycol.tag == "Player") || PlayerMove.t < 150)
+      return;
+    this.battle += Random.Range(0, 90);
+    if (this.battle > 100)
+    {
+      this.menu.battleID = this.battlescene;
+      this.encountgroup.enemySt[0] = this.groups[0];
+      for (this.i = 1; this.i < 3; ++this.i)
+        this.encountgroup.enemySt[this.i] = this.groups[Random.Range(0, this.Encoutgroup)];
+      this.Position.GetComponent<MenuOpen>().returnscene = this.returnscene_send;
+      this.nowtransform = this.Player.transform.position;
+      this.startpos.startpos = new Vector3(this.nowtransform.x, this.nowtransform.y, this.nowtransform.z);
+      PlayerMove.t = 0;
+      SceneManager.LoadScene(5);
+    }
+    else
+      PlayerMove.t = 0;
+  }
+}

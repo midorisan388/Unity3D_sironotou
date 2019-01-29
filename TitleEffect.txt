@@ -1,0 +1,31 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class TitleEffect : MonoBehaviour
+{
+  private Color titlecolor = new Color(0.0f, 0.0f, 0.0f, 1f);
+  private float t = 1f;
+  public Image image;
+  private Image title;
+  public bool titlesel;
+
+  private void Start()
+  {
+    this.title = this.GetComponent<Image>();
+  }
+
+  private void Update()
+  {
+    if ((double) this.t > 0.0)
+    {
+      this.title.color = this.titlecolor;
+      this.titlecolor.a = this.t;
+      this.t -= 0.01f;
+      if ((double) this.t > 0.0)
+        return;
+      this.title.enabled = false;
+    }
+    else
+      this.titlesel = true;
+  }
+}

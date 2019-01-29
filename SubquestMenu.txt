@@ -1,0 +1,302 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class ScrollController : MonoBehaviour
+{
+  private int page = 0;
+  private string[,] Qest_porpose = new string[16, 5]
+  {
+    {
+      "???",
+      "薬草を5個集める",
+      "エリンに薬草を集めたことを見せよう",
+      "Clear!",
+      ""
+    },
+    {
+      "???",
+      "薬草を5個集める",
+      "",
+      "",
+      ""
+    },
+    {
+      "???",
+      "薬草を5個集める",
+      "",
+      "",
+      ""
+    },
+    {
+      "???",
+      "薬草を5個集める",
+      "",
+      "",
+      ""
+    },
+    {
+      "???",
+      "薬草を5個集める",
+      "",
+      "",
+      ""
+    },
+    {
+      "???",
+      "薬草を5個集める",
+      "",
+      "",
+      ""
+    },
+    {
+      "???",
+      "薬草を5個集める",
+      "",
+      "",
+      ""
+    },
+    {
+      "???",
+      "薬草を5個集める",
+      "",
+      "",
+      ""
+    },
+    {
+      "???",
+      "薬草を5個集める",
+      "",
+      "",
+      ""
+    },
+    {
+      "???",
+      "薬草を5個集める",
+      "",
+      "",
+      ""
+    },
+    {
+      "???",
+      "薬草を5個集める",
+      "",
+      "",
+      ""
+    },
+    {
+      "???",
+      "薬草を5個集める",
+      "",
+      "",
+      ""
+    },
+    {
+      "???",
+      "薬草を5個集める",
+      "",
+      "",
+      ""
+    },
+    {
+      "???",
+      "薬草を5個集める",
+      "",
+      "",
+      ""
+    },
+    {
+      "???",
+      "薬草を5個集める",
+      "",
+      "",
+      ""
+    },
+    {
+      "???",
+      "薬草を5個集める",
+      "",
+      "",
+      ""
+    }
+  };
+  private string[,] quest_descriptiontrxt = new string[16, 5];
+  private MenuOpen menu;
+  private int i;
+  public string[] Qesttext;
+  public string[] Qest_title;
+  public int[] Qest_clearcount;
+  public bool[] QestClearflag;
+  public Text Title;
+  public Text Description;
+  public Text porpose;
+  public GameObject[] name;
+  public Button BackPage;
+  public Button Nextpage;
+  private ItemList itemlis;
+
+  private void Start()
+  {
+    this.menu = this.GetComponent<MenuOpen>();
+    this.itemlis = this.GetComponent<ItemList>();
+    for (this.i = 0; this.i < 9; ++this.i)
+    {
+      if (this.Qest_clearcount[this.i] > 0)
+        this.name[this.i].GetComponent<Text>().text = this.Qest_title[this.i + this.page].ToString();
+      else
+        this.name[this.i].GetComponent<Text>().text = "???";
+    }
+  }
+
+  public void DiscriptionSet()
+  {
+    this.quest_descriptiontrxt = new string[16, 5]
+    {
+      {
+        "???",
+        "エリンからアイテムの大切さを教わった。薬草を5個集めるところから始めよう\n" + (object) this.itemlis.itemhave_con[0] + "/5",
+        "エリンからアイテムの大切さを教わった。\nアイテムも揃えたからエリンに見せに行こう" + (object) this.itemlis.itemhave_con[0] + "/5",
+        "エリンからアイテムの大切さを教わった。\n旅のなかでいろいろなアイテムの使い方を覚えていく大切さをわすれないようにしよう。",
+        ""
+      },
+      {
+        "???",
+        "通常の倍の修業ができる道具があるという。老師に頼まれた素材を取りに行こう。\n" + (object) this.itemlis.itemhave_mat[3] + "/5",
+        "通常の倍の修業ができる道具があるという。\n素材が集まったら老師に届けに行こう\n" + (object) this.itemlis.itemhave_mat[3] + "/5",
+        "通常の倍の修業ができる道具があるという。\n老師からもらった道具は身に着けておくだけで経験が積める代物だ。\n戦闘で活用していこう",
+        ""
+      },
+      {
+        "???",
+        "港町クシナモの酒場でマスターから「涙乙女」のおとぎ話を聞いた。\nそこへ盗賊が乱入してきたが謎の男の協力もあり無事に乗り切れたが、不可解な言葉を残して消えてしまった。\nマスターからのお礼も預かって男を探しに行こう",
+        "港町クシナモの酒場でマスターから「涙乙女」のおとぎ話を聞いた。\nそこへ盗賊が乱入してきたが謎の男の協力もあり無事に乗り切れた。男が言うには、自分は人目に晒せるような者ではないらしい。\n気になる言葉を残していったが今はそっとしておこう。マスターへの会計を届けに行こう。",
+        "港町クシナモの酒場でマスターから「涙乙女」のおとぎ話を聞いた。\nそこへ盗賊が乱入してきたが謎の男の協力もあり無事に乗り切れた。男が言うには、自分は人目に晒せるような者ではないらしい。\n気になる言葉を残していったが今はそっとしておこう。マスターはあの男の正体に覚えがあるらしいが…？",
+        ""
+      },
+      {
+        "???",
+        "紅都シンテの寺院に参拝に寄った。そこはミドの一族「水龍神の末裔」が守護する神殿だった。\nミドの姉であるセルドルはミドを一族の出来損ないだと言い、それに反発するミドに魔物を嗾けてきた。\nそれらを退けた後にも二人の意見は衝突するばかりだった。\n彼女は、今は旅を続けることを優先したいらしい。寺院の巫女に事情を話していこう。",
+        "紅都シンテの寺院に参拝に寄った。そこはミドの一族「水龍神の末裔」が守護する神殿だった。\nミドの姉であるセルドルはミドを一族の出来損ないだと言い、それに反発するミドに魔物を嗾けてきた。\nそれらを退けた後にも二人の意見は衝突するばかりだった。\n彼女は自分の選んだ道を真っすぐに進みたいと前向きに捉えているようだった。",
+        "",
+        ""
+      },
+      {
+        "???",
+        "",
+        "",
+        "",
+        ""
+      },
+      {
+        "???",
+        "",
+        "",
+        "",
+        ""
+      },
+      {
+        "???",
+        "",
+        "",
+        "",
+        ""
+      },
+      {
+        "???",
+        "",
+        "",
+        "",
+        ""
+      },
+      {
+        "???",
+        "",
+        "",
+        "",
+        ""
+      },
+      {
+        "???",
+        "",
+        "",
+        "",
+        ""
+      },
+      {
+        "???",
+        "",
+        "",
+        "",
+        ""
+      },
+      {
+        "???",
+        "",
+        "",
+        "",
+        ""
+      },
+      {
+        "???",
+        "",
+        "",
+        "",
+        ""
+      },
+      {
+        "???",
+        "",
+        "",
+        "",
+        ""
+      },
+      {
+        "???",
+        "",
+        "",
+        "",
+        ""
+      },
+      {
+        "???",
+        "",
+        "",
+        "",
+        ""
+      }
+    };
+  }
+
+  public void Update()
+  {
+    if (this.menu.menuID != 5)
+      return;
+    this.DiscriptionSet();
+    for (this.i = 0; this.i < 9; ++this.i)
+    {
+      if (this.Qest_clearcount[this.i] > 0)
+        this.name[this.i].GetComponent<Text>().text = this.Qest_title[this.i + this.page].ToString();
+      else
+        this.name[this.i].GetComponent<Text>().text = "???";
+    }
+  }
+
+  public void OnClick(int no)
+  {
+    if (this.Qest_clearcount[no + this.page] <= 0)
+      return;
+    this.name[no].GetComponent<Text>().text = this.Qest_title[this.Qest_clearcount[no + this.page]].ToString();
+    this.Title.GetComponent<Text>().text = this.Qest_title[no + this.page];
+    this.Description.GetComponent<Text>().text = this.quest_descriptiontrxt[no + this.page, this.Qest_clearcount[no + this.page]];
+    this.porpose.GetComponent<Text>().text = this.Qest_porpose[no + this.page, this.Qest_clearcount[no + this.page]];
+  }
+
+  public void PageControlle(int x)
+  {
+    this.page += x;
+    if (this.page < 0)
+      this.page = 0;
+    if (this.page <= 3)
+      return;
+    this.page = 3;
+  }
+}

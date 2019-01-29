@@ -1,0 +1,24 @@
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class GameOverSceneManager : MonoBehaviour
+{
+  private float t = 1f;
+  public Image image;
+  private Image title;
+
+  private void Start()
+  {
+    this.title = this.GetComponent<Image>();
+  }
+
+  private void Update()
+  {
+    this.title.color = new Color(1f, 0.8f, 0.1f, this.t);
+    this.t -= 0.01f;
+    if ((double) this.t > 0.0 || !Input.GetKeyDown("space"))
+      return;
+    SceneManager.LoadScene(0);
+  }
+}

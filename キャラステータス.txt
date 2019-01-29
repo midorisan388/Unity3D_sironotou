@@ -1,0 +1,167 @@
+using UnityEngine;
+
+public class PartyStetus : MonoBehaviour
+{
+  public int fillseal = 0;
+  public int heal = 1;
+  public int yellcount = 0;
+  public int reis = 0;
+  public bool[] craun = new bool[4];
+  public bool aura = false;
+  public int passion = 0;
+  public int antihial = 0;
+  public int cut = 0;
+  public int mist = 0;
+  public int crono = 0;
+  public int Andead = 0;
+  public int[] muteki = new int[4];
+  public int[] suzuran = new int[4];
+  public int ether = 3;
+  public int zokusei_up = 0;
+  public int dangan = 0;
+  public int colorgun = 0;
+  public int dexup = 0;
+  public float suijin = 0.0f;
+  public int teikouup = 0;
+  private int[] upHP = new int[4]{ 198, 297, 178, 201 };
+  private int[] upMP = new int[4]{ 20, 10, 30, 18 };
+  private int[] uppower = new int[4]{ 17, 15, 11, 14 };
+  private int[] upINT = new int[4]{ 17, 12, 20, 15 };
+  private float[] updex = new float[4]{ 5f, 2f, 1f, 3f };
+  private int[] updeff = new int[4]{ 8, 12, 3, 4 };
+  public int suzuran_get = 0;
+  public PartyStetus.status[] partystatus = new PartyStetus.status[4];
+  private WeponMenu weponmenu;
+  private WeponList weponlis;
+  private MenuOpen menu;
+  public int[] assasin;
+  public bool[] genkaku;
+  public int resight;
+  public float Drivegage;
+  public int[] setID;
+  private int i;
+  private int j;
+
+  public void Start()
+  {
+    this.menu = this.GetComponent<MenuOpen>();
+    this.weponmenu = this.GetComponent<WeponMenu>();
+    this.weponlis = this.GetComponent<WeponList>();
+    for (this.i = 0; this.i < 4; ++this.i)
+    {
+      this.partystatus[this.i].ssp_act = false;
+      this.partystatus[this.i].HP = 99999;
+      this.partystatus[this.i].MP = 99999;
+    }
+  }
+
+  private void Update()
+  {
+    this.Drivegage = Mathf.Clamp(this.Drivegage, 0.0f, 1f);
+    for (this.i = 0; this.i < 4; ++this.i)
+    {
+      if (!this.menu.battle)
+      {
+        this.fillseal = 0;
+        this.yellcount = 0;
+        this.partystatus[this.i].condition_pos = 0;
+        this.partystatus[this.i].condition_pri = 0;
+        this.partystatus[this.i].condition_sleeep = 0;
+        this.partystatus[this.i].condition_charm = 0;
+        this.partystatus[this.i].condition_brin = 0;
+        this.partystatus[this.i].condition_yakedo = 0;
+      }
+      this.partystatus[this.i].maxHP = 100 + (this.upHP[this.i] - (50 - this.partystatus[this.i].level)) * this.partystatus[this.i].level + this.weponlis.acs_upHP[this.weponmenu.setID[this.i]];
+      this.partystatus[this.i].maxMP = 30 + this.upMP[this.i] * this.partystatus[this.i].level + this.weponlis.acs_upMP[this.weponmenu.setID[this.i]];
+      this.partystatus[this.i].needexp = this.partystatus[this.i].level >= 100 ? 0 : (100 * (int) Mathf.Pow((float) (int) (1.5 + 1.0 / (1.0 + ((double) this.partystatus[this.i].level + 10.0)) * 0.300000011920929), (float) (this.partystatus[this.i].level - 1)) * this.partystatus[this.i].level + this.partystatus[this.i].level / 5 * 50) * 2;
+      this.partystatus[this.i].power = 10 + this.uppower[this.i] * this.partystatus[this.i].level + this.weponlis.acs_upower[this.weponmenu.setID[this.i]];
+      this.partystatus[this.i].INT = 10 + this.upINT[this.i] * this.partystatus[this.i].level + this.weponlis.acs_upINT[this.weponmenu.setID[this.i]];
+      this.partystatus[this.i].dex = (float) (8.0 + (double) this.updex[this.i] * (double) this.partystatus[this.i].level);
+      this.partystatus[this.i].deff = 5 + this.updeff[this.i] * this.partystatus[this.i].level + this.weponlis.acs_updeff[this.weponmenu.setID[this.i]];
+      this.partystatus[this.i].poison_ = 50 + this.teikouup;
+      this.partystatus[this.i].pris_ = 50 + this.teikouup;
+      this.partystatus[this.i].sleeep_ = 50 + this.teikouup;
+      this.partystatus[this.i].charm_ = 50 + this.teikouup;
+      this.partystatus[this.i].brin_ = 50 + this.teikouup;
+      this.partystatus[this.i].yakedo_ = 50 + this.teikouup;
+      this.partystatus[this.i].fire_ = 50 + this.zokusei_up;
+      this.partystatus[this.i].ice_ = 50 + this.zokusei_up;
+      this.partystatus[this.i].shine_ = 50 + this.zokusei_up;
+      this.partystatus[this.i].dark_ = 50 + this.zokusei_up;
+      if (this.i == 0)
+        this.partystatus[0].deff -= 2 * this.fillseal * this.partystatus[this.i].level;
+      if (this.i == 1)
+      {
+        this.partystatus[1].power *= 1 + this.resight;
+        this.partystatus[1].deff *= (3 - this.resight) / 3;
+      }
+    }
+    if (this.menu.charpartyflag[0])
+    {
+      this.partystatus[0].name = "イヴァン";
+      if (this.menu.battle)
+        this.fillseal = this.partystatus[0].condition_pos <= 0 ? (this.partystatus[0].condition_pri <= 0 ? (this.partystatus[0].condition_sleeep <= 0 ? (this.partystatus[0].condition_charm <= 0 ? (this.partystatus[0].condition_brin <= 0 ? (this.partystatus[0].condition_yakedo <= 0 ? 0 : 1) : 1) : 1) : 1) : 1) : 1;
+    }
+    if (this.menu.charpartyflag[1])
+      this.partystatus[1].name = "フォグ";
+    if (this.menu.charpartyflag[2])
+      this.partystatus[2].name = "ラン";
+    if (this.menu.charpartyflag[3])
+      this.partystatus[3].name = "ミド";
+    for (this.i = 0; this.i < 4; ++this.i)
+    {
+      this.partystatus[this.i].HP = Mathf.Clamp(this.partystatus[this.i].HP, 0, this.partystatus[this.i].maxHP);
+      this.partystatus[this.i].MP = Mathf.Clamp(this.partystatus[this.i].MP, 0, this.partystatus[this.i].maxMP);
+      this.partystatus[this.i].level = Mathf.Clamp(this.partystatus[this.i].level, 1, 100);
+    }
+  }
+
+  public void ResignCheck(int memberID)
+  {
+    if (this.partystatus[memberID].HP <= 0)
+    {
+      ++this.resight;
+    }
+    else
+    {
+      if (this.partystatus[memberID].HP <= 0)
+        return;
+      --this.resight;
+    }
+  }
+
+  public struct status
+  {
+    public string name;
+    public int level;
+    public int maxHP;
+    public int HP;
+    public int maxMP;
+    public int MP;
+    public float dex;
+    public int power;
+    public int INT;
+    public int deff;
+    public int fire_;
+    public int ice_;
+    public int shine_;
+    public int dark_;
+    public int magic_;
+    public int poison_;
+    public int pris_;
+    public int sleeep_;
+    public int charm_;
+    public int brin_;
+    public int yakedo_;
+    public int condition_pos;
+    public int condition_pri;
+    public int condition_sleeep;
+    public int condition_charm;
+    public int condition_brin;
+    public int condition_yakedo;
+    public bool gatu;
+    public bool ssp_act;
+    public int needexp;
+    public int haveexp;
+  }
+}

@@ -1,0 +1,127 @@
+using UnityEngine;
+
+public class Mevanicshop : MonoBehaviour
+{
+  private bool modeselect = false;
+  private int materialmode = 0;
+  private int i;
+  private int t;
+  private int selectsyopmode;
+  public GameObject windiwmes;
+  public GUIStyle buttonstyle;
+  [SerializeField]
+  private GameObject Player;
+  private GameObject manager;
+  private MenuOpen menu;
+  private ItemList itemlis;
+  private WeponList weponlis;
+  private Animator plyanim;
+  public GameObject[] GouseiCanVas;
+  public ShopItemList shopitem;
+  private int current;
+
+  private void Start()
+  {
+    this.plyanim = this.Player.GetComponent<Animator>();
+    this.manager = GameObject.Find("GameManager");
+    this.menu = this.manager.GetComponent<MenuOpen>();
+    this.itemlis = this.manager.GetComponent<ItemList>();
+    this.weponlis = this.manager.GetComponent<WeponList>();
+  }
+
+  private void OnTriggerEnter(Collider other)
+  {
+    if (!(other.tag == "Player"))
+      return;
+    this.selectsyopmode = 1;
+    this.current = 0;
+  }
+
+  private void OnTriggerStay(Collider other)
+  {
+    if (this.current == 0)
+    {
+      this.modeselect = true;
+      this.menu.talkflag = true;
+      this.plyanim.SetFloat("walk", 0.0f);
+      this.plyanim.SetFloat("run", 0.0f);
+      ++this.current;
+    }
+    if (this.current == 1)
+    {
+      ++this.t;
+      if (this.t >= 20)
+      {
+        if ((double) Input.GetAxis("Vertical") > 0.0)
+        {
+          this.t = 0;
+          this.selectsyopmode = 1;
+        }
+        if ((double) Input.GetAxis("Vertical") < 0.0)
+        {
+          this.t = 0;
+          this.selectsyopmode = 2;
+        }
+        if (Input.GetButtonDown("Fire3"))
+        {
+          this.t = 0;
+          ++this.current;
+          this.OnClick(this.selectsyopmode);
+        }
+      }
+    }
+    if (this.current < 1 || !Input.GetButtonDown("Fire2"))
+      return;
+    for (this.i = 1; this.i < this.GouseiCanVas.Length; ++this.i)
+      this.GouseiCanVas[this.i].SetActive(false);
+    this.materialmode = 0;
+    this.modeselect = false;
+    this.windiwmes.SetActive(false);
+    this.GouseiCanVas[0].SetActive(false);
+    this.menu.talkflag = false;
+  }
+
+  private void OnTriggerExit(Collider other)
+  {
+    if (!(other.tag == "Player"))
+      return;
+    this.materialmode = 0;
+    this.modeselect = false;
+    this.windiwmes.SetActive(false);
+    this.GouseiCanVas[0].SetActive(false);
+    this.menu.talkflag = false;
+  }
+
+  private void OnGUI()
+  {
+    if (this.modeselect && this.materialmode == 0)
+    {
+      if (GUI.Button(new Rect(0.0f, 0.0f, 100f, 50f), "”ƒ‚¤", this.buttonstyle))
+      {
+        ++this.current;
+        this.OnClick(1);
+      }
+      if (GUI.Button(new Rect(0.0f, 60f, 100f, 50f), "•Ší‡¬", this.buttonstyle))
+      {
+        ++this.current;
+        this.OnClick(2);
+      }
+    }
+    if (this.materialmode == 1)
+    {
+      this.GouseiCanVas[0].SetActive(true);
+      this.menu.talkflag = true;
+    }
+    else
+      this.GouseiCanVas[0].SetActive(false);
+    if (this.materialmode == 2)
+      this.GouseiCanVas[1].SetActive(true);
+    else
+      this.GouseiCanVas[1].SetActive(false);
+  }
+
+  public void OnClick(int num)
+  {
+    this.materialmode = num;
+  }
+}

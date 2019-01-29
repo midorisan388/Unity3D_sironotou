@@ -1,0 +1,41 @@
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class Gate : MonoBehaviour
+{
+  public int scene;
+  public int returnscene_send;
+  public float afterx;
+  public float aftery;
+  public float afterz;
+  public float afterqx;
+  public float afterqy;
+  public float afterqz;
+  private Image feedout;
+  private GameObject Position;
+  private MenuOpen menu;
+  private StartPosition start;
+
+  private void Start()
+  {
+    this.feedout = GameObject.Find("feedout").GetComponent<Image>();
+    this.Position = GameObject.Find("GameManager");
+    this.menu = this.Position.GetComponent<MenuOpen>();
+    this.start = this.Position.GetComponent<StartPosition>();
+  }
+
+  private void OnTriggerEnter(Collider myCollider)
+  {
+    if (!(myCollider.tag == "Player"))
+      return;
+    this.feedout.color = new Color(0.0f, 0.0f, 0.0f, (float) byte.MaxValue);
+    this.start.startpos = new Vector3(this.afterx, this.aftery, this.afterz);
+    this.menu.warpflag_ = false;
+    this.start.qx = this.afterqx;
+    this.start.qy = this.afterqy;
+    this.start.qz = this.afterqz;
+    PlayerMove.t = 0;
+    SceneManager.LoadScene(this.scene);
+  }
+}

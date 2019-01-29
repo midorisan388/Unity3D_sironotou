@@ -1,0 +1,55 @@
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class DanjonGate : MonoBehaviour
+{
+  private bool collidermode = false;
+  private Color feed = new Color((float) byte.MaxValue, (float) byte.MaxValue, (float) byte.MaxValue, (float) byte.MaxValue);
+  public int warpflag_danjon;
+  public int scene;
+  public float afterx;
+  public float aftery;
+  public float afterz;
+  public float afxqx;
+  public float afqy;
+  public float afqz;
+  public GameObject Position;
+  private Image feedout;
+  private MenuOpen menu;
+  public string danjon;
+  private StartPosition start;
+
+  private void Start()
+  {
+    this.feedout = GameObject.Find("feedout").GetComponent<Image>();
+    this.Position = GameObject.Find("GameManager");
+    this.start = this.Position.GetComponent<StartPosition>();
+    this.menu = this.Position.GetComponent<MenuOpen>();
+  }
+
+  private void OnTriggerStay(Collider myCollider)
+  {
+    if (!(myCollider.tag == "Player"))
+      return;
+    this.collidermode = true;
+  }
+
+  private void OnGUI()
+  {
+    if (!this.collidermode || !GUI.Button(new Rect(0.0f, 0.0f, 100f, 50f), "" + this.danjon))
+      return;
+    this.feedout.color = this.feed;
+    this.start.startpos = new Vector3(this.afterx, this.aftery, this.afterz);
+    this.menu.warpflag_ = this.warpflag_danjon == 0;
+    this.start.qx = this.afqz;
+    this.start.qy = this.afqy;
+    this.start.qz = this.afqz;
+    SceneManager.LoadScene(this.scene);
+  }
+
+  private void OnTriggerExit(Collider other)
+  {
+    this.collidermode = false;
+  }
+}

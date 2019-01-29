@@ -1,0 +1,59 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class NPCtalk_Ran : MonoBehaviour
+{
+  private MenuOpen menu;
+  public Image NPCmescanvas;
+  public Text mes_settext;
+  public GameObject parent;
+  private int i;
+  public int[] story_;
+  public int[] storytextchange;
+  public string[] npc_messege;
+
+  private void Start()
+  {
+    this.menu = GameObject.Find("GameManager").GetComponent<MenuOpen>();
+    this.Story_ObjectInstance();
+  }
+
+  private void OnTriggerEnter(Collider other)
+  {
+    if (!(other.tag == "Player") || this.menu.talkflag)
+      return;
+    for (this.i = 0; this.i < this.storytextchange.Length; ++this.i)
+    {
+      if (this.menu.story >= this.storytextchange[this.i])
+        this.mes_settext.text = this.npc_messege[this.i];
+    }
+    this.TalkSet();
+  }
+
+  private void OnTriggerExit(Collider other)
+  {
+    if (!(other.tag == "Player") || this.menu.talkflag)
+      return;
+    this.mes_settext.text = "";
+    this.mes_settext.enabled = false;
+    this.NPCmescanvas.enabled = false;
+  }
+
+  public void TalkSet()
+  {
+    this.NPCmescanvas.enabled = true;
+    this.mes_settext.enabled = true;
+  }
+
+  public void Story_ObjectInstance()
+  {
+    for (this.i = 0; this.i < this.story_.Length; ++this.i)
+    {
+      if (this.menu.story == this.story_[this.i])
+      {
+        Object.Destroy((Object) this.parent);
+        break;
+      }
+    }
+  }
+}

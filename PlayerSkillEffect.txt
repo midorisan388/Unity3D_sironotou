@@ -1,0 +1,1558 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class Playerturn_skilleffect : MonoBehaviour
+{
+  private Animator[] ptmotion = new Animator[4];
+  public GameObject partycle = (GameObject) null;
+  private int randamdamageup = 0;
+  private string Charactionskillname = "";
+  private float drain = 0.0f;
+  private float reborn = 0.0f;
+  private int hubukideth = 0;
+  public bool hubukislow = false;
+  public int kikyou = 0;
+  public int[] sumire_count = new int[4];
+  public int sumireup = 0;
+  public int shell = 0;
+  public int zokuseibaria = 0;
+  public int materiabaria = 0;
+  public int magic_stance = 0;
+  private float drivup = 0.0f;
+  public int teikou = 0;
+  private SystemMenu systemmenu;
+  private BattleturnManager batllemanager;
+  private PartyStetus PTstetas;
+  private EnemyStetus enemuST;
+  private SkillMenu PTskill;
+  private MenuOpen menu;
+  private ConditionController condition;
+  private int i;
+  private int t;
+  private int st;
+  public int usemp_zero;
+  private int damage_text_mode;
+  public int mpkabau;
+  public int dexupturn;
+  public Text ATKpanel;
+  public Text DEFpanel;
+  public Text ENHpanel;
+  public Text JAMpanel;
+  public GameObject SkillPanel;
+  private Text SkillPlate;
+  public GameObject CommandPanel_ivan;
+  public GameObject CommandPanel_fog;
+  public GameObject CommandPanel_ran;
+  public GameObject CommandPanel_mido;
+  private GameObject SkillnamePanel;
+  public Text DriveName;
+  public GameObject Skillpanel_parent;
+  public Text Info;
+  private int damage;
+  private int useMP;
+  private float kisodamage;
+
+  private void Start()
+  {
+    this.SkillnamePanel = GameObject.Find("Skillname");
+    this.SkillPlate = this.SkillnamePanel.GetComponent<Text>();
+    this.systemmenu = GameObject.Find("GameManager").GetComponent<SystemMenu>();
+    this.PTskill = GameObject.Find("GameManager").GetComponent<SkillMenu>();
+    this.batllemanager = this.GetComponent<BattleturnManager>();
+    this.PTstetas = GameObject.Find("GameManager").GetComponent<PartyStetus>();
+    this.menu = GameObject.Find("GameManager").GetComponent<MenuOpen>();
+    this.condition = this.GetComponent<ConditionController>();
+    for (this.i = 0; this.i < 4; ++this.i)
+      this.ptmotion[this.i] = this.batllemanager.PartyModel[this.i].GetComponent<Animator>();
+  }
+
+  private void Update()
+  {
+    if (this.st <= 0)
+    {
+      this.Skillpanel_parent.SetActive(false);
+    }
+    else
+    {
+      this.Skillpanel_parent.SetActive(true);
+      --this.st;
+    }
+    ++this.t;
+  }
+
+  public void OnClick_ATK()
+  {
+    this.batllemanager.ptmotion[this.batllemanager.comandmember].SetFloat("ATK", 3f);
+    this.Charactionskillname = this.Charactionskillname = this.PTskill.charskilllist[this.batllemanager.comandmember].ATKSkillname[this.PTskill.setskill_atk[this.batllemanager.comandmember]].ToString();
+    if (this.batllemanager.comandmember == 0)
+      this.IvanATK(this.PTskill.setskill_atk[this.batllemanager.comandmember]);
+    else if (this.batllemanager.comandmember == 1)
+      this.FogATK(this.PTskill.setskill_atk[this.batllemanager.comandmember]);
+    else if (this.batllemanager.comandmember == 2)
+    {
+      this.RanATK(this.PTskill.setskill_atk[this.batllemanager.comandmember]);
+    }
+    else
+    {
+      if (this.batllemanager.comandmember != 3)
+        return;
+      this.MidoATK(this.PTskill.setskill_atk[this.batllemanager.comandmember]);
+    }
+  }
+
+  public void IvanATK(int skillID)
+  {
+    switch (skillID)
+    {
+      case 0:
+        this.kisodamage = this.PTskill.Skilllean_bool[0, 0, 5] != 1 ? (this.PTskill.Skilllean_bool[0, 0, 4] != 1 ? (float) this.PTstetas.partystatus[0].power * 1.1f : (float) this.PTstetas.partystatus[0].power * 1.3f) : (float) this.PTstetas.partystatus[0].power * 1.5f;
+        this.randamdamageup = Random.Range(0, (int) this.kisodamage);
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage) + (float) this.randamdamageup;
+        this.useMP = this.UseMPSet(0, 0);
+        if (this.PTstetas.partystatus[0].MP >= this.useMP)
+        {
+          this.partycle = (GameObject) UnityEngine.Resources.Load("PartyParticle/Ivan/ATK_ivan/Sque");
+          this.AllorSolo(0, 0, 0, this.batllemanager.enemyCopy_[0].damagecut, this.batllemanager.enemyCopy_[1].damagecut, this.batllemanager.enemyCopy_[2].damagecut, 0, this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].damagecut, this.kisodamage, 0);
+          this.PTstetas.aura = false;
+          this.Selectreset(this.Charactionskillname);
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+      case 1:
+        if (this.PTskill.Skilllean_bool[0, 0, 7] == 1)
+        {
+          this.kisodamage = (float) this.PTstetas.partystatus[0].power * 1.2f;
+          this.drain = 0.5f;
+        }
+        else if (this.PTskill.Skilllean_bool[0, 0, 6] == 1)
+        {
+          this.kisodamage = (float) this.PTstetas.partystatus[0].power * 1f;
+          this.drain = 0.3f;
+        }
+        else
+        {
+          this.kisodamage = (float) this.PTstetas.partystatus[0].power * 0.7f;
+          this.drain = 0.1f;
+        }
+        this.randamdamageup = Random.Range(0, (int) this.kisodamage);
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage) + (float) this.randamdamageup;
+        this.useMP = this.UseMPSet(0, 1);
+        if (this.PTstetas.partystatus[0].MP >= this.useMP)
+        {
+          this.partycle = (GameObject) UnityEngine.Resources.Load("PartyParticle/Ivan/ATK_ivan/Circl");
+          this.AllorSolo(0, 0, 0, this.batllemanager.enemyCopy_[0].damagecut, this.batllemanager.enemyCopy_[1].damagecut, this.batllemanager.enemyCopy_[2].damagecut, 0, this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].damagecut, this.kisodamage, 0);
+          this.PTstetas.partystatus[0].HP += (int) ((double) this.damage * (double) this.drain);
+          this.PTstetas.aura = false;
+          this.Info.text = "イヴァンは" + (object) (int) ((double) this.damage * (double) this.drain) + "のHPを吸収した";
+          this.PTstetas.partystatus[0].MP -= this.useMP;
+          this.Selectreset(this.Charactionskillname);
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+      case 2:
+        this.kisodamage = this.PTskill.Skilllean_bool[0, 0, 9] != 1 ? (this.PTskill.Skilllean_bool[0, 0, 8] != 1 ? (float) ((double) this.PTstetas.partystatus[0].level * (double) this.PTstetas.partystatus[0].power * 0.100000001490116) : (float) ((double) this.PTstetas.partystatus[0].level * (double) this.PTstetas.partystatus[0].power * 0.400000005960464)) : (float) ((double) this.PTstetas.partystatus[0].level * (double) this.PTstetas.partystatus[0].power * 0.800000011920929);
+        this.randamdamageup = Random.Range(0, (int) this.kisodamage);
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage) + (float) this.randamdamageup;
+        this.useMP = this.UseMPSet(0, 2);
+        if (this.PTstetas.partystatus[0].MP > this.useMP)
+        {
+          this.partycle = (GameObject) UnityEngine.Resources.Load("PartyParticle/Ivan/ATK_ivan/Line");
+          this.All_Atack(0, 0, 0, this.batllemanager.enemyCopy_[0].damagecut, this.batllemanager.enemyCopy_[1].damagecut, this.batllemanager.enemyCopy_[2].damagecut, this.kisodamage, 0);
+          this.PTstetas.aura = false;
+          this.Selectreset(this.Charactionskillname);
+          this.PTstetas.partystatus[0].MP -= this.useMP;
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+      case 3:
+        this.kisodamage = this.PTskill.Skilllean_bool[0, 0, 11] != 1 ? (this.PTskill.Skilllean_bool[0, 0, 10] != 1 ? (float) this.PTstetas.partystatus[0].INT * 1.3f : (float) this.PTstetas.partystatus[0].INT * 1.3f) : (float) this.PTstetas.partystatus[0].INT * 1.3f;
+        this.randamdamageup = Random.Range(0, (int) this.kisodamage);
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage) + (float) this.randamdamageup;
+        this.useMP = this.UseMPSet(0, 3);
+        if (this.PTstetas.partystatus[0].MP > this.useMP)
+        {
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/AttackHit");
+          this.All_Atack(0, 0, 0, this.batllemanager.enemyCopy_[0].magiccut, this.batllemanager.enemyCopy_[1].magiccut, this.batllemanager.enemyCopy_[2].magiccut, this.kisodamage, 0);
+          if (this.PTskill.Skilllean_bool[0, 0, 11] == 1)
+          {
+            this.kisodamage = (float) this.PTstetas.partystatus[0].power * 0.8f;
+            this.AllorSolo(0, 0, 0, this.batllemanager.enemyCopy_[0].magiccut, this.batllemanager.enemyCopy_[1].magiccut, this.batllemanager.enemyCopy_[2].magiccut, 0, this.batllemanager.enemyCopy_[Random.Range(0, this.batllemanager.listlenght - 1)].damagecut, this.kisodamage, 0);
+            int num = 0;
+            while (num < 2)
+              ++num;
+          }
+          else if (this.PTskill.Skilllean_bool[0, 0, 10] == 1)
+          {
+            this.kisodamage = (float) this.PTstetas.partystatus[0].power * 0.5f;
+            this.AllorSolo(0, 0, 0, this.batllemanager.enemyCopy_[0].magiccut, this.batllemanager.enemyCopy_[1].magiccut, this.batllemanager.enemyCopy_[2].magiccut, 0, this.batllemanager.enemyCopy_[Random.Range(0, this.batllemanager.listlenght - 1)].damagecut, this.kisodamage, 0);
+          }
+          this.PTstetas.aura = false;
+          this.Selectreset(this.Charactionskillname);
+          this.PTstetas.partystatus[0].MP -= this.useMP;
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+      case 12:
+        if (this.PTskill.Skilllean_bool[0, 0, 13] == 1)
+        {
+          this.kisodamage = (float) this.PTstetas.partystatus[0].power * 1.3f;
+          this.drain = 1f;
+        }
+        else
+        {
+          this.kisodamage = (float) this.PTstetas.partystatus[0].power * 0.8f;
+          this.drain = 0.5f;
+        }
+        this.randamdamageup = Random.Range(0, (int) this.kisodamage);
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage) + (float) this.randamdamageup;
+        this.useMP = this.UseMPSet(0, 12);
+        if (this.PTstetas.partystatus[0].MP < this.useMP)
+          break;
+        this.partycle = (GameObject) UnityEngine.Resources.Load("particle/BattleGear-Kunai");
+        this.AllorSolo(0, 0, 0, this.batllemanager.enemyCopy_[0].damagecut, this.batllemanager.enemyCopy_[1].damagecut, this.batllemanager.enemyCopy_[2].damagecut, 0, this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].damagecut, this.kisodamage, 0);
+        this.PTstetas.partystatus[0].HP += (int) ((double) this.damage * (double) this.drain);
+        this.PTstetas.partystatus[0].MP += (int) ((double) this.damage * (double) this.drain);
+        this.PTstetas.aura = false;
+        this.Info.text = "イヴァンは" + (object) (int) ((double) this.damage * (double) this.drain) + "のHPとMPを吸収した";
+        this.PTstetas.partystatus[0].MP -= this.useMP;
+        this.Selectreset(this.Charactionskillname);
+        break;
+      case 14:
+        this.kisodamage = (float) ((double) this.PTstetas.partystatus[0].power * 1.5 + (double) this.PTstetas.partystatus[0].INT * 1.29999995231628);
+        this.randamdamageup = Random.Range(0, (int) this.kisodamage);
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage) + (float) this.randamdamageup;
+        this.drain = 0.3f;
+        this.useMP = this.UseMPSet(0, 14);
+        if (this.PTstetas.partystatus[0].MP > this.useMP)
+        {
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/AttackHit");
+          this.All_Atack(this.batllemanager.enemyCopy_[0].magiccut, this.batllemanager.enemyCopy_[1].magiccut, this.batllemanager.enemyCopy_[2].magiccut, this.batllemanager.enemyCopy_[0].damagecut, this.batllemanager.enemyCopy_[1].damagecut, this.batllemanager.enemyCopy_[2].damagecut, this.kisodamage, 0);
+          this.All_Atack(this.batllemanager.enemyCopy_[0].magiccut, this.batllemanager.enemyCopy_[1].magiccut, this.batllemanager.enemyCopy_[2].magiccut, this.batllemanager.enemyCopy_[0].damagecut, this.batllemanager.enemyCopy_[1].damagecut, this.batllemanager.enemyCopy_[2].damagecut, this.kisodamage, 1);
+          for (this.i = 0; this.i < 4; ++this.i)
+          {
+            if (this.menu.charpartyflag[this.i])
+            {
+              this.PTstetas.partystatus[this.i].HP += (int) ((double) this.damage * (double) this.drain);
+              this.PTstetas.partystatus[this.i].MP += (int) ((double) this.damage * (double) this.drain);
+            }
+          }
+          this.Selectreset(this.Charactionskillname);
+          this.PTstetas.partystatus[0].MP -= this.useMP;
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+      case 15:
+        this.kisodamage = (float) this.PTstetas.partystatus[0].power * 1.2f;
+        this.randamdamageup = Random.Range(0, (int) this.kisodamage);
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage) + (float) this.randamdamageup;
+        this.drain = 0.5f;
+        this.useMP = this.UseMPSet(0, 15);
+        if (this.PTstetas.partystatus[0].MP > this.useMP)
+        {
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/AttackHit");
+          this.All_Atack(this.batllemanager.enemyCopy_[0].magiccut, this.batllemanager.enemyCopy_[1].magiccut, this.batllemanager.enemyCopy_[2].magiccut, this.batllemanager.enemyCopy_[0].damagecut, this.batllemanager.enemyCopy_[1].damagecut, this.batllemanager.enemyCopy_[2].damagecut, this.kisodamage, 0);
+          for (this.i = 0; this.i < 4; ++this.i)
+          {
+            if (this.menu.charpartyflag[this.i])
+              this.PTstetas.partystatus[this.i].HP += (int) ((double) this.damage * (double) this.drain);
+          }
+          this.Info.text = "イヴァンは" + (object) (int) ((double) this.damage * (double) this.drain) + "のHPを吸収した";
+          this.Selectreset(this.Charactionskillname);
+          this.PTstetas.partystatus[0].MP -= this.useMP;
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+      case 16:
+        if (this.PTskill.Skilllean_bool[0, 0, 17] == 1)
+        {
+          this.kisodamage = (float) ((double) this.PTstetas.partystatus[0].power * 1.20000004768372 + (double) this.PTstetas.partystatus[0].INT * 1.10000002384186);
+          this.drain = 0.3f;
+        }
+        else
+        {
+          this.kisodamage = (float) ((double) this.PTstetas.partystatus[0].power * 1.10000002384186 + (double) this.PTstetas.partystatus[0].INT * 0.699999988079071);
+          this.randamdamageup = Random.Range(0, (int) this.kisodamage);
+          this.drain = 0.0f;
+        }
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage) + (float) this.randamdamageup;
+        this.useMP = this.UseMPSet(0, 16);
+        if (this.PTstetas.partystatus[0].MP > this.useMP)
+        {
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/AttackHit");
+          this.AllorSolo(this.batllemanager.enemyCopy_[0].magiccut, this.batllemanager.enemyCopy_[1].magiccut, this.batllemanager.enemyCopy_[2].magiccut, this.batllemanager.enemyCopy_[0].damagecut, this.batllemanager.enemyCopy_[1].damagecut, this.batllemanager.enemyCopy_[2].damagecut, this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].magiccut, this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].damagecut, this.kisodamage, 0);
+          this.PTstetas.partystatus[0].HP += (int) ((double) this.damage * (double) this.drain);
+          this.PTstetas.partystatus[0].MP += (int) ((double) this.damage * (double) this.drain);
+          this.Info.text = "イヴァンは" + (object) (int) ((double) this.damage * (double) this.drain) + "のHPとMPを吸収した";
+          this.PTstetas.aura = false;
+          this.Selectreset(this.Charactionskillname);
+          this.PTstetas.partystatus[0].MP -= this.useMP;
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+      case 18:
+        this.kisodamage = (float) ((double) this.PTstetas.partystatus[0].power * 1.5 + (double) this.PTstetas.partystatus[0].INT * 1.29999995231628);
+        this.randamdamageup = Random.Range(0, (int) this.kisodamage);
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage) + (float) this.randamdamageup;
+        this.useMP = this.UseMPSet(0, 18);
+        if (this.PTstetas.partystatus[0].MP >= this.useMP)
+        {
+          int index = Random.Range(0, this.batllemanager.listlenght - 1);
+          this.AllorSolo(this.batllemanager.enemyCopy_[0].magiccut, this.batllemanager.enemyCopy_[1].magiccut, this.batllemanager.enemyCopy_[2].magiccut, this.batllemanager.enemyCopy_[0].damagecut, this.batllemanager.enemyCopy_[1].damagecut, this.batllemanager.enemyCopy_[2].damagecut, this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].magiccut, this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].damagecut, this.kisodamage, 0);
+          this.kisodamage = (float) this.PTstetas.partystatus[0].power * 1.1f;
+          this.randamdamageup = Random.Range(0, (int) this.kisodamage);
+          this.kisodamage = this.EnemyMagicCut(this.kisodamage) + (float) this.randamdamageup;
+          this.AllorSolo(this.batllemanager.enemyCopy_[0].magiccut, this.batllemanager.enemyCopy_[1].magiccut, this.batllemanager.enemyCopy_[2].magiccut, this.batllemanager.enemyCopy_[0].damagecut, this.batllemanager.enemyCopy_[1].damagecut, this.batllemanager.enemyCopy_[2].damagecut, 0, this.batllemanager.enemyCopy_[index].damagecut, this.kisodamage, 0);
+          this.PTstetas.aura = false;
+          this.Selectreset(this.Charactionskillname);
+          this.PTstetas.partystatus[0].MP -= this.useMP;
+        }
+        else
+          this.Info.text = "MPが足りません";
+        break;
+    }
+  }
+
+  public void FogATK(int skillID)
+  {
+    switch (skillID)
+    {
+      case 0:
+        this.kisodamage = (float) this.PTstetas.partystatus[1].power * 1.1f;
+        this.partycle = (GameObject) UnityEngine.Resources.Load("PartyParticle/Fog/ATK/hangetu");
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage);
+        this.useMP = this.UseMPSet(0, 0);
+        if (this.PTstetas.partystatus[1].MP >= this.useMP)
+        {
+          this.AllorSolo(0, 0, 0, this.batllemanager.enemyCopy_[0].damagecut, this.batllemanager.enemyCopy_[1].damagecut, this.batllemanager.enemyCopy_[2].damagecut, 0, this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].damagecut, this.kisodamage, 0);
+          this.Info.text = "フォグは" + (object) this.damage + "のダメージを与えた";
+          this.PTstetas.aura = false;
+          this.Selectreset(this.Charactionskillname);
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+      case 1:
+        if (this.PTskill.Skilllean_bool[1, 0, 7] == 1)
+        {
+          this.kisodamage = (float) this.PTstetas.partystatus[1].power * 3f;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Explosion single_2 sharp");
+        }
+        else if (this.PTskill.Skilllean_bool[1, 0, 6] == 1)
+        {
+          this.kisodamage = (float) this.PTstetas.partystatus[1].power * 2f;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Explosion loop fallback");
+        }
+        else
+        {
+          this.kisodamage = (float) this.PTstetas.partystatus[1].power * 1.5f;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Fire basic sharp");
+        }
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage);
+        this.useMP = this.UseMPSet(0, 1);
+        if (this.PTstetas.partystatus[1].MP >= this.useMP)
+        {
+          this.AllorSolo(0, 0, 0, 0, 0, 0, 0, 0, this.kisodamage, 0);
+          this.PTstetas.partystatus[1].MP -= this.useMP;
+          this.Info.text = "フォグは" + (object) this.damage + "のダメージを与えた";
+          this.PTstetas.aura = false;
+          this.Selectreset(this.Charactionskillname);
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+      case 2:
+        if (this.PTskill.Skilllean_bool[1, 0, 9] == 1)
+        {
+          this.kisodamage = 3f * (float) this.PTstetas.partystatus[1].INT;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Explosion single_2 sharp");
+        }
+        else if (this.PTskill.Skilllean_bool[1, 0, 8] == 1)
+        {
+          this.kisodamage = 1.5f * (float) this.PTstetas.partystatus[1].INT;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Explosion loop fallback");
+        }
+        else
+        {
+          this.kisodamage = 1.1f * (float) this.PTstetas.partystatus[1].INT;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Fire basic sharp");
+        }
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage);
+        this.useMP = this.UseMPSet(0, 2);
+        if (this.PTstetas.partystatus[1].MP >= this.useMP)
+        {
+          this.All_Atack(0, 0, 0, this.batllemanager.enemyCopy_[0].magiccut, this.batllemanager.enemyCopy_[1].magiccut, this.batllemanager.enemyCopy_[2].magiccut, this.kisodamage, 0);
+          this.EffectMotion(0, 1);
+          for (this.i = 0; this.i < 3; ++this.i)
+            this.batllemanager.enemyCopy_[this.i].HP -= this.damage;
+          this.PTstetas.partystatus[1].MP -= this.useMP;
+          this.Info.text = "フォグは" + (object) this.damage + "のダメージを与えた";
+          this.Selectreset(this.Charactionskillname);
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+    }
+  }
+
+  public void RanATK(int skillID)
+  {
+    switch (skillID)
+    {
+      case 0:
+        if (this.PTskill.Skilllean_bool[2, 0, 5] == 1)
+        {
+          this.kisodamage = (float) ((double) this.PTstetas.partystatus[2].INT * 1.5 * (0.800000011920929 * (double) this.PTstetas.ether));
+          this.partycle = (GameObject) UnityEngine.Resources.Load("PartyParticle/Ran/ATK_ran/Fire");
+        }
+        else if (this.PTskill.Skilllean_bool[2, 0, 4] == 1)
+        {
+          this.kisodamage = (float) ((double) this.PTstetas.partystatus[2].INT * 1.20000004768372 * (0.800000011920929 * (double) this.PTstetas.ether));
+          if (this.damage <= 0)
+            this.damage = 0;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("PartyParticle/Ran/ATK_ran/Fire2");
+        }
+        else
+        {
+          this.kisodamage = (float) this.PTstetas.partystatus[2].INT * (0.8f * (float) this.PTstetas.ether);
+          if (this.damage <= 0)
+            this.damage = 0;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("PartyParticle/Ran/ATK_ran/Fire3");
+        }
+        this.randamdamageup = Random.Range(0, (int) this.kisodamage);
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage) + (float) this.randamdamageup;
+        this.useMP = this.UseMPSet(0, 0);
+        if (this.PTstetas.ether > 0)
+        {
+          if (this.PTstetas.aura || this.PTskill.Skilllean_bool[2, 0, 5] == 1)
+            this.All_Atack(this.batllemanager.enemyCopy_[0].magiccut, this.batllemanager.enemyCopy_[1].magiccut, this.batllemanager.enemyCopy_[2].magiccut, this.batllemanager.enemyCopy_[0].firecut, this.batllemanager.enemyCopy_[1].firecut, this.batllemanager.enemyCopy_[2].firecut, this.kisodamage, 0);
+          else
+            this.Solo_Atack(this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].magiccut, this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].firecut, this.kisodamage);
+          this.Info.text = "ランは" + (object) this.damage + "のダメージを与えた";
+          this.PTstetas.aura = false;
+          this.Selectreset(this.Charactionskillname);
+          --this.PTstetas.ether;
+          if (this.PTstetas.ether != 0)
+            break;
+          this.condition.Destroyparticle(2);
+          break;
+        }
+        this.Info.text = "エーテルが足りません";
+        break;
+      case 1:
+        if (this.PTskill.Skilllean_bool[2, 0, 7] == 1)
+        {
+          this.kisodamage = (float) ((double) this.PTstetas.partystatus[2].INT * 1.5 * (0.800000011920929 * (double) this.PTstetas.ether));
+          if (this.damage <= 0)
+            this.damage = 0;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/MagicRune3");
+        }
+        else if (this.PTskill.Skilllean_bool[2, 0, 6] == 1)
+        {
+          this.kisodamage = (float) ((double) this.PTstetas.partystatus[2].INT * 1.20000004768372 + 0.800000011920929 * (double) this.PTstetas.ether);
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Soul sharp");
+        }
+        else
+        {
+          this.kisodamage = (float) this.PTstetas.partystatus[2].INT + 0.8f * (float) this.PTstetas.ether;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Soul sharp");
+        }
+        this.randamdamageup = Random.Range(0, (int) this.kisodamage);
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage) + (float) this.randamdamageup;
+        this.useMP = this.UseMPSet(0, 1);
+        if (this.PTstetas.ether > 0)
+        {
+          if (this.PTstetas.aura || this.PTskill.Skilllean_bool[2, 0, 7] == 1)
+            this.All_Atack(this.batllemanager.enemyCopy_[0].magiccut, this.batllemanager.enemyCopy_[1].magiccut, this.batllemanager.enemyCopy_[2].magiccut, this.batllemanager.enemyCopy_[0].icecut, this.batllemanager.enemyCopy_[1].icecut, this.batllemanager.enemyCopy_[2].icecut, this.kisodamage, 0);
+          else
+            this.Solo_Atack(this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].magiccut, this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].icecut, this.kisodamage);
+          this.Info.text = "ランは" + (object) this.damage + "のダメージを与えた";
+          this.PTstetas.aura = false;
+          this.Selectreset(this.Charactionskillname);
+          --this.PTstetas.ether;
+          if (this.PTstetas.ether != 0)
+            break;
+          this.condition.Destroyparticle(2);
+          break;
+        }
+        this.Info.text = "エーテルが足りません";
+        break;
+      case 2:
+        if (this.PTskill.Skilllean_bool[2, 0, 9] == 1)
+        {
+          this.kisodamage = (float) ((double) this.PTstetas.partystatus[2].INT * 1.5 + 0.800000011920929 * (double) this.PTstetas.ether);
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle / Soul sharp");
+        }
+        else if (this.PTskill.Skilllean_bool[2, 0, 8] == 1)
+        {
+          this.kisodamage = (float) ((double) this.PTstetas.partystatus[2].INT * 1.20000004768372 * (0.800000011920929 * (double) this.PTstetas.ether));
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle / Soul sharp");
+        }
+        else
+        {
+          this.kisodamage = (float) this.PTstetas.partystatus[2].INT * (0.8f * (float) this.PTstetas.ether);
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle / Soul sharp");
+        }
+        this.randamdamageup = Random.Range(0, (int) this.kisodamage);
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage) + (float) this.randamdamageup;
+        this.useMP = this.UseMPSet(0, 2);
+        if (this.PTstetas.ether > 0)
+        {
+          if (this.PTstetas.aura || this.PTskill.Skilllean_bool[2, 0, 9] == 1)
+            this.All_Atack(this.batllemanager.enemyCopy_[0].magiccut, this.batllemanager.enemyCopy_[1].magiccut, this.batllemanager.enemyCopy_[2].magiccut, this.batllemanager.enemyCopy_[0].shinecut, this.batllemanager.enemyCopy_[1].shinecut, this.batllemanager.enemyCopy_[2].shinecut, this.kisodamage, 0);
+          else
+            this.Solo_Atack(this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].magiccut, this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].shinecut, this.kisodamage);
+          this.Info.text = "ランは" + (object) this.damage + "のダメージを与えた";
+          this.t = 0;
+          this.PTstetas.aura = false;
+          this.Selectreset(this.Charactionskillname);
+          --this.PTstetas.ether;
+          if (this.PTstetas.ether != 0)
+            break;
+          this.condition.Destroyparticle(2);
+          break;
+        }
+        this.Info.text = "エーテルが足りません";
+        break;
+      case 3:
+        if (this.PTskill.Skilllean_bool[2, 0, 11] == 1)
+        {
+          this.kisodamage = (float) ((double) this.PTstetas.partystatus[2].INT * 2.0 * (0.800000011920929 * (double) this.PTstetas.ether));
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle /MagicRune4");
+        }
+        else if (this.PTskill.Skilllean_bool[2, 0, 10] == 1)
+        {
+          this.kisodamage = (float) ((double) this.PTstetas.partystatus[2].INT * 1.5 * (0.800000011920929 * (double) this.PTstetas.ether));
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle / Soul sharp");
+        }
+        else
+        {
+          this.kisodamage = (float) ((double) this.PTstetas.partystatus[2].INT * 1.10000002384186 * (0.800000011920929 * (double) this.PTstetas.ether));
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle / Soul sharp");
+        }
+        this.randamdamageup = Random.Range(0, (int) this.kisodamage);
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage) + (float) this.randamdamageup;
+        this.useMP = this.UseMPSet(0, 3);
+        if (this.PTstetas.ether > 0 || this.PTstetas.partystatus[2].MP >= this.useMP)
+        {
+          if (this.PTstetas.aura || this.PTskill.Skilllean_bool[2, 0, 3] == 1)
+            this.All_Atack(0, 0, 0, this.batllemanager.enemyCopy_[0].magiccut, this.batllemanager.enemyCopy_[1].magiccut, this.batllemanager.enemyCopy_[2].magiccut, this.kisodamage, 0);
+          else
+            this.Solo_Atack(0, this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].magiccut, this.kisodamage);
+          this.Info.text = "ランは" + (object) this.damage + "のダメージを与えた";
+          this.PTstetas.aura = false;
+          this.t = 0;
+          this.Selectreset(this.Charactionskillname);
+          --this.PTstetas.ether;
+          if (this.PTstetas.ether != 0)
+            break;
+          this.condition.Destroyparticle(2);
+          break;
+        }
+        this.Info.text = "使用できません";
+        break;
+    }
+  }
+
+  public void MidoATK(int skillID)
+  {
+    switch (skillID)
+    {
+      case 0:
+        this.useMP = this.UseMPSet(0, 0);
+        int num = Random.Range(0, 5);
+        this.kisodamage = (float) this.PTstetas.partystatus[3].power * 0.8f;
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage);
+        if (this.PTstetas.aura)
+        {
+          this.All_Atack(0, 0, 0, this.batllemanager.enemyCopy_[0].damagecut, this.batllemanager.enemyCopy_[1].damagecut, this.batllemanager.enemyCopy_[2].damagecut, this.kisodamage, 0);
+          for (this.i = 0; this.i < 2; ++this.i)
+          {
+            if (this.PTskill.Skilllean_bool[3, 0, 5] == 1)
+            {
+              if (num == 0)
+                this.batllemanager.enemyCopy_[this.i].condition_pos = 3;
+              if (num == 1)
+                this.batllemanager.enemyCopy_[this.i].condition_pri = 3;
+              if (num == 2)
+                this.batllemanager.enemyCopy_[this.i].condition_slep = 3;
+              if (num == 3)
+                this.batllemanager.enemyCopy_[this.i].condition_charm = 3;
+              if (num == 4)
+                this.batllemanager.enemyCopy_[this.i].condition_bri = 3;
+            }
+            else if (this.PTskill.Skilllean_bool[3, 0, 4] == 1)
+            {
+              if (num == 0)
+                this.batllemanager.enemyCopy_[this.i].condition_pos = 3;
+              if (num == 1)
+                this.batllemanager.enemyCopy_[this.i].condition_pri = 3;
+              if (num == 2)
+                this.batllemanager.enemyCopy_[this.i].condition_slep = 3;
+            }
+            else
+            {
+              if (num == 0)
+                this.batllemanager.enemyCopy_[this.i].condition_pos = 3;
+              if (num == 1)
+                this.batllemanager.enemyCopy_[this.i].condition_pri = 3;
+              if (num == 2)
+                this.batllemanager.enemyCopy_[this.i].condition_slep = 3;
+            }
+          }
+        }
+        else
+        {
+          this.Solo_Atack(0, this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].damagecut, this.kisodamage);
+          if (this.PTskill.Skilllean_bool[3, 0, 5] == 1)
+          {
+            if (num == 0)
+              this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].condition_pos = 3;
+            if (num == 1)
+              this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].condition_pri = 3;
+            if (num == 2)
+              this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].condition_slep = 3;
+            if (num == 3)
+              this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].condition_charm = 3;
+            if (num == 4)
+              this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].condition_bri = 3;
+          }
+          else if (this.PTskill.Skilllean_bool[3, 0, 4] == 1)
+          {
+            if (num == 0)
+              this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].condition_pos = 3;
+            if (num == 1)
+              this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].condition_pri = 3;
+            if (num == 2)
+              this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].condition_slep = 3;
+          }
+          else
+          {
+            if (num == 0)
+              this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].condition_pos = 3;
+            if (num == 1)
+              this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].condition_pri = 3;
+            if (num == 2)
+              this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].condition_slep = 3;
+          }
+        }
+        this.Info.text = "ミドは" + (object) this.damage + "のダメージを与えた";
+        this.PTstetas.aura = false;
+        this.Selectreset(this.Charactionskillname);
+        break;
+      case 1:
+        this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Water Splash soft");
+        this.kisodamage = (float) this.PTstetas.partystatus[3].power * 0.5f;
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage);
+        this.useMP = this.UseMPSet(0, 1);
+        if (this.PTstetas.dangan == 1)
+        {
+          if (this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].condition_bakusan > 0)
+          {
+            this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].HP = 0;
+            this.Info.text = this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].name.ToString() + "は爆散した";
+          }
+          this.PTstetas.dangan = 0;
+        }
+        if (this.PTstetas.aura)
+          this.All_Atack(0, 0, 0, this.batllemanager.enemyCopy_[0].damagecut, this.batllemanager.enemyCopy_[1].damagecut, this.batllemanager.enemyCopy_[2].damagecut, this.kisodamage, 0);
+        else
+          this.Solo_Atack(0, this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].damagecut, this.kisodamage);
+        this.PTstetas.aura = false;
+        this.Selectreset(this.Charactionskillname);
+        break;
+      case 2:
+        this.kisodamage = (float) this.PTstetas.partystatus[3].power + (float) this.PTstetas.partystatus[3].power * this.batllemanager.Draive.fillAmount;
+        this.kisodamage = this.EnemyMagicCut(this.kisodamage);
+        this.useMP = this.UseMPSet(0, 2);
+        if (this.PTstetas.aura)
+        {
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Water Splash soft");
+          this.All_Atack(0, 0, 0, this.batllemanager.enemyCopy_[0].damagecut, this.batllemanager.enemyCopy_[1].damagecut, this.batllemanager.enemyCopy_[2].damagecut, this.kisodamage, 0);
+        }
+        else
+          this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].HP -= this.damage;
+        this.Info.text = "ミドは" + (object) this.damage + "のダメージを与えた";
+        this.PTstetas.aura = false;
+        this.Selectreset(this.Charactionskillname);
+        break;
+    }
+  }
+
+  public void OnClick_DEF()
+  {
+    this.batllemanager.ptmotion[this.batllemanager.comandmember].SetFloat("DEF", 3f);
+    this.Charactionskillname = this.Charactionskillname = this.PTskill.charskilllist[this.batllemanager.comandmember].DEFSkillname[this.PTskill.setskill_def[this.batllemanager.comandmember]].ToString();
+    if (this.batllemanager.comandmember == 0)
+      this.IvanDEF(this.PTskill.setskill_def[this.batllemanager.comandmember]);
+    else if (this.batllemanager.comandmember == 1)
+      this.FogDEF(this.PTskill.setskill_def[this.batllemanager.comandmember]);
+    else if (this.batllemanager.comandmember == 2)
+    {
+      this.RanDEF(this.PTskill.setskill_def[this.batllemanager.comandmember]);
+    }
+    else
+    {
+      if (this.batllemanager.comandmember != 3)
+        return;
+      this.MidoDEF(this.PTskill.setskill_def[this.batllemanager.comandmember]);
+    }
+  }
+
+  public void IvanDEF(int skillID)
+  {
+    switch (skillID)
+    {
+      case 0:
+        this.PTstetas.heal = this.PTskill.Skilllean_bool[0, 1, 5] != 1 ? (this.PTskill.Skilllean_bool[0, 1, 4] != 1 ? (int) ((double) this.PTstetas.partystatus[0].INT * 1.0) : (int) ((double) this.PTstetas.partystatus[0].INT * 1.20000004768372)) : (int) ((double) this.PTstetas.partystatus[0].INT * 1.79999995231628);
+        if (this.PTstetas.yellcount > 0)
+          this.PTstetas.heal += this.PTstetas.partystatus[0].INT * 2;
+        this.useMP = this.UseMPSet(1, 0);
+        if (this.PTstetas.partystatus[0].MP >= this.useMP)
+        {
+          for (this.i = 0; this.i < 4; ++this.i)
+          {
+            if (this.PTstetas.partystatus[this.i].HP > 0 && this.menu.charpartyflag[this.i])
+            {
+              this.batllemanager.DamageTextpop(this.PTstetas.heal, 3, this.i);
+              this.PTstetas.partystatus[this.i].HP += (int) ((double) this.PTstetas.partystatus[this.i].HP * 0.1) + this.PTstetas.heal;
+            }
+          }
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Shine-1-Particles");
+          this.EffectMotion(1, 0);
+          this.Info.text = "イヴァンは体力を" + (object) this.PTstetas.heal + "回復した";
+          this.Selectreset(this.Charactionskillname);
+          break;
+        }
+        this.Info.GetComponent<Text>().text = "MPが足りません";
+        break;
+      case 1:
+        this.useMP = this.PTskill.Skilllean_bool[0, 1, 7] != 1 ? (this.PTskill.Skilllean_bool[0, 1, 6] != 1 ? this.PTskill.charskilllist[0].DEFSkillMP[3] : this.PTskill.charskilllist[0].DEFSkillMP[4]) : this.PTskill.charskilllist[0].DEFSkillMP[5];
+        this.useMP = this.UseMPSet(1, 1);
+        if (this.PTstetas.partystatus[0].MP >= this.useMP)
+        {
+          for (this.i = 0; this.i < 4; ++this.i)
+          {
+            if (this.PTstetas.partystatus[this.i].condition_pos > 0)
+            {
+              this.PTstetas.partystatus[this.i].condition_pos = 0;
+              this.condition.Destroyparticle(this.i);
+            }
+            if (this.PTstetas.partystatus[this.i].condition_pri > 0)
+            {
+              this.PTstetas.partystatus[this.i].condition_pri = 0;
+              this.condition.Destroyparticle(this.i);
+            }
+            if (this.PTstetas.partystatus[this.i].condition_sleeep > 0)
+            {
+              this.PTstetas.partystatus[this.i].condition_sleeep = 0;
+              this.condition.Destroyparticle(this.i);
+            }
+            if (this.PTstetas.partystatus[this.i].condition_charm > 0)
+            {
+              this.PTstetas.partystatus[this.i].condition_charm = 0;
+              this.condition.Destroyparticle(this.i);
+            }
+            if (this.PTstetas.partystatus[this.i].condition_brin > 0)
+            {
+              this.PTstetas.partystatus[this.i].condition_brin = 0;
+              this.condition.Destroyparticle(this.i);
+            }
+            if (this.PTstetas.partystatus[this.i].condition_yakedo > 0)
+            {
+              this.PTstetas.partystatus[this.i].condition_yakedo = 0;
+              this.condition.Destroyparticle(this.i);
+            }
+            if (this.PTskill.Skilllean_bool[0, 1, 7] == 1)
+              this.PTstetas.partystatus[this.i].MP += this.PTstetas.partystatus[this.i].maxMP / 10;
+            else if (this.PTskill.Skilllean_bool[0, 1, 6] == 1)
+              this.PTstetas.partystatus[this.i].MP += this.PTstetas.partystatus[this.i].MP / 10;
+          }
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Shine-2-Particles");
+          this.EffectMotion(1, 0);
+          this.Selectreset(this.Charactionskillname);
+          break;
+        }
+        this.Info.GetComponent<Text>().text = "MPが足りません";
+        break;
+      case 2:
+        this.PTstetas.heal = this.PTskill.Skilllean_bool[0, 1, 9] != 1 ? (this.PTskill.Skilllean_bool[0, 1, 8] != 1 ? this.PTstetas.partystatus[0].INT : this.PTstetas.partystatus[0].INT * 2) : this.PTstetas.partystatus[0].INT * 3;
+        this.useMP = this.UseMPSet(1, 2);
+        if (this.PTstetas.partystatus[0].MP >= this.useMP)
+        {
+          if (this.menu.charpartyflag[1] && this.PTstetas.partystatus[1].HP <= 0)
+          {
+            if (this.menu.charpartyflag[2] && this.PTstetas.partystatus[2].HP <= 0)
+            {
+              if (this.menu.charpartyflag[3] && this.PTstetas.partystatus[3].HP <= 0)
+              {
+                this.PTstetas.reis = Random.Range(1, 4);
+                this.PTstetas.ResignCheck(this.PTstetas.reis);
+              }
+              else
+              {
+                this.PTstetas.reis = Random.Range(1, 3);
+                this.PTstetas.ResignCheck(this.PTstetas.reis);
+              }
+            }
+            else if (this.menu.charpartyflag[3] && this.PTstetas.partystatus[3].HP <= 0)
+            {
+              this.PTstetas.reis = Random.Range(0, 2);
+              this.PTstetas.ResignCheck(this.PTstetas.reis);
+            }
+            else
+            {
+              this.PTstetas.partystatus[this.PTstetas.reis].HP += this.PTstetas.heal;
+              this.PTstetas.ResignCheck(this.PTstetas.reis);
+            }
+          }
+          else if (this.menu.charpartyflag[2] && this.PTstetas.partystatus[2].HP <= 0)
+          {
+            if (this.menu.charpartyflag[3] && this.PTstetas.partystatus[3].HP <= 0)
+            {
+              this.PTstetas.reis = Random.Range(2, 4);
+              this.PTstetas.ResignCheck(this.PTstetas.reis);
+            }
+            else
+            {
+              this.PTstetas.reis = 2;
+              this.PTstetas.ResignCheck(2);
+            }
+          }
+          else if (this.menu.charpartyflag[3] && this.PTstetas.partystatus[3].HP <= 0)
+          {
+            this.PTstetas.reis = 3;
+            this.PTstetas.ResignCheck(3);
+          }
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Soul fallback");
+          this.PTstetas.partystatus[this.PTstetas.reis].HP += this.PTstetas.heal;
+          this.Selectreset(this.Charactionskillname);
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+    }
+  }
+
+  public void FogDEF(int skillID)
+  {
+    switch (skillID)
+    {
+      case 0:
+        this.useMP = this.UseMPSet(1, 0);
+        if (this.PTstetas.partystatus[1].MP >= this.useMP)
+        {
+          this.kikyou += 3;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/BattleGear-Shield");
+          this.Selectreset(this.Charactionskillname);
+          this.Info.text = "フォグはかばう体勢に入った";
+          break;
+        }
+        this.Info.GetComponent<Text>().text = "MPが足りません";
+        break;
+      case 1:
+        this.useMP = this.UseMPSet(1, 1);
+        if (this.PTstetas.partystatus[1].MP >= this.useMP)
+        {
+          for (this.i = 0; this.i < 4; ++this.i)
+            this.sumire_count[this.i] = this.sumireup;
+          this.sumireup = this.PTskill.Skilllean_bool[1, 1, 7] != 1 ? (this.PTskill.Skilllean_bool[1, 1, 6] != 1 ? 10 : 20) : 500;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Ritual");
+          this.Selectreset(this.Charactionskillname);
+          this.Info.text = "フォグは防御の構えをとった";
+          break;
+        }
+        this.Info.GetComponent<Text>().text = "MPが足りません";
+        break;
+      case 2:
+        this.useMP = this.UseMPSet(1, 6);
+        if (this.PTstetas.partystatus[1].MP >= this.useMP)
+        {
+          int num = 3;
+          this.PTstetas.suzuran_get = 50;
+          for (this.i = 0; this.i < 4; ++this.i)
+            this.PTstetas.suzuran[this.i] += num;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Spark-3-Particles");
+          this.Selectreset(this.Charactionskillname);
+          this.Info.text = "フォグは結界を張った";
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+      case 3:
+        this.useMP = this.UseMPSet(0, 9);
+        if (this.PTstetas.partystatus[1].MP >= this.useMP)
+        {
+          for (this.i = 0; this.i < 4; ++this.i)
+            this.PTstetas.muteki[this.i] += 3;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Spark-3-Particles");
+          this.Selectreset(this.Charactionskillname);
+          this.Info.text = "フォグは紅桜を放った";
+          this.PTstetas.partystatus[1].HP = 0;
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+    }
+  }
+
+  public void RanDEF(int skillID)
+  {
+    switch (skillID)
+    {
+      case 0:
+        int num;
+        if (this.PTskill.Skilllean_bool[2, 1, 5] == 1)
+        {
+          num = 7;
+          this.useMP = this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1];
+        }
+        else if (this.PTskill.Skilllean_bool[2, 1, 4] == 0)
+        {
+          num = 5;
+          this.useMP = this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1];
+        }
+        else
+        {
+          num = 3;
+          this.useMP = this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1];
+        }
+        this.useMP = this.UseMPSet(1, 0);
+        if (this.PTstetas.partystatus[2].MP >= this.useMP)
+        {
+          this.shell = num;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Spark-3-Particles");
+          this.Selectreset(this.Charactionskillname);
+          this.Info.text = "味方の魔法防御力があがった";
+          break;
+        }
+        this.Info.GetComponent<Text>().text = "MPが足りません";
+        break;
+      case 1:
+        if (this.PTskill.Skilllean_bool[2, 1, 7] == 1)
+        {
+          this.PTstetas.zokusei_up = 100;
+          this.useMP = this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1];
+        }
+        else if (this.PTskill.Skilllean_bool[2, 1, 6] == 1)
+        {
+          this.PTstetas.zokusei_up = 50;
+          this.useMP = this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1];
+        }
+        else
+        {
+          this.PTstetas.zokusei_up = 30;
+          this.useMP = this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1];
+        }
+        this.useMP = this.UseMPSet(1, 1);
+        if (this.PTstetas.partystatus[2].MP >= this.useMP)
+        {
+          this.zokuseibaria = 5;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Spark-3-Particles");
+          this.Selectreset(this.Charactionskillname);
+          this.Info.text = "味方の属性耐性があがった";
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+      case 2:
+        this.useMP = this.PTskill.Skilllean_bool[2, 1, 9] != 1 ? (this.PTskill.Skilllean_bool[2, 1, 8] != 1 ? this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1] : this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1]) : this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1];
+        this.useMP = this.UseMPSet(1, 2);
+        if (this.PTstetas.partystatus[2].MP >= this.useMP)
+        {
+          this.materiabaria = 5;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Spark-3-Particles");
+          this.Selectreset(this.Charactionskillname);
+          this.Info.text = "ランは魔力を吸収するバリアを作った";
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+    }
+  }
+
+  public void MidoDEF(int skillID)
+  {
+    switch (skillID)
+    {
+      case 0:
+        if (this.PTskill.Skilllean_bool[3, 1, 5] == 1)
+        {
+          this.teikou = 6;
+          this.PTstetas.teikouup = 30;
+          this.useMP = this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1];
+        }
+        else if (this.PTskill.Skilllean_bool[3, 1, 4] == 1)
+        {
+          this.teikou = 3;
+          this.PTstetas.teikouup = 20;
+          this.useMP = this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1];
+        }
+        else
+        {
+          this.teikou = 2;
+          this.PTstetas.teikouup = 10;
+          this.useMP = this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1];
+        }
+        this.useMP = this.UseMPSet(1, 0);
+        if (this.PTstetas.partystatus[3].MP >= this.useMP)
+        {
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Spark-3-Particles");
+          this.Selectreset(this.Charactionskillname);
+          this.Info.text = "味方の異常耐性が上がった";
+          break;
+        }
+        this.Info.GetComponent<Text>().text = "MPが足りません";
+        break;
+      case 1:
+        this.useMP = this.PTskill.Skilllean_bool[3, 1, 7] != 1 ? (this.PTskill.Skilllean_bool[3, 1, 6] != 1 ? this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1] : this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1]) : this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1];
+        this.useMP = this.UseMPSet(1, 1);
+        if (this.PTstetas.partystatus[3].MP >= this.useMP)
+        {
+          this.mpkabau = 1;
+          this.PTstetas.partystatus[3].MP -= this.useMP;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Spark-3-Particles");
+          this.Selectreset(this.Charactionskillname);
+          this.Info.text = "敵の攻撃を魔力が肩代わりする";
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+      case 2:
+        this.useMP = this.PTskill.Skilllean_bool[3, 1, 9] != 1 ? (this.PTskill.Skilllean_bool[3, 1, 8] != 1 ? this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1] : this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1]) : this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[1];
+        this.useMP = this.UseMPSet(1, 2);
+        if (this.PTstetas.partystatus[3].MP >= this.useMP)
+        {
+          for (this.i = 0; this.i < 4; ++this.i)
+            this.PTstetas.partystatus[this.i].gatu = true;
+          this.PTstetas.partystatus[3].MP -= this.useMP;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Spark-3-Particles");
+          this.Selectreset(this.Charactionskillname);
+          this.Info.text = "味方にガッツ状態を付与した";
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+    }
+  }
+
+  public void OnClick_ENH()
+  {
+    this.Charactionskillname = this.Charactionskillname = this.PTskill.charskilllist[this.batllemanager.comandmember].ENHSkillname[this.PTskill.setskill_enh[this.batllemanager.comandmember]].ToString();
+    this.batllemanager.ptmotion[this.batllemanager.comandmember].SetFloat("ENH", 3f);
+    if (this.batllemanager.comandmember == 0)
+      this.IvanENH(this.PTskill.setskill_enh[this.batllemanager.comandmember]);
+    else if (this.batllemanager.comandmember == 1)
+      this.FogENH(this.PTskill.setskill_enh[this.batllemanager.comandmember]);
+    else if (this.batllemanager.comandmember == 2)
+    {
+      this.RanENH(this.PTskill.setskill_enh[this.batllemanager.comandmember]);
+    }
+    else
+    {
+      if (this.batllemanager.comandmember != 3)
+        return;
+      this.MidoENH(this.PTskill.setskill_enh[this.batllemanager.comandmember]);
+    }
+  }
+
+  public void IvanENH(int skillID)
+  {
+    switch (skillID)
+    {
+      case 0:
+        this.PTstetas.yellcount = this.PTskill.Skilllean_bool[0, 2, 5] != 1 ? (this.PTskill.Skilllean_bool[0, 2, 4] != 1 ? 300 : 500) : 700;
+        this.Info.text = "イヴァンは回復力が上昇した";
+        this.Selectreset(this.Charactionskillname);
+        break;
+      case 1:
+        if (this.useMP > this.PTstetas.partystatus[0].MP)
+          break;
+        this.PTstetas.aura = true;
+        this.Info.text = "イヴァンはオーラ状態になった";
+        this.Selectreset(this.Charactionskillname);
+        break;
+      case 2:
+        if (this.useMP > this.PTstetas.partystatus[0].MP)
+          break;
+        this.PTstetas.passion = 3000;
+        this.Info.text = "イヴァンはパッションを使った";
+        this.Selectreset(this.Charactionskillname);
+        break;
+      case 3:
+        if (this.useMP > this.PTstetas.partystatus[0].MP)
+          break;
+        for (this.i = 0; this.i < 4; ++this.i)
+        {
+          if (this.PTskill.Skilllean_bool[0, 2, 12] == 1)
+          {
+            if (this.menu.charpartyflag[this.i])
+            {
+              this.PTstetas.craun[this.i] = true;
+              if (this.PTstetas.partystatus[this.i].HP <= 0)
+                this.PTstetas.partystatus[this.i].HP += this.PTstetas.partystatus[0].INT * 30 / 10;
+            }
+          }
+          else if (this.menu.charpartyflag[this.i])
+            this.PTstetas.craun[this.i] = true;
+        }
+        this.Info.text = "イヴァンはクラウンベルを使った";
+        this.Selectreset(this.Charactionskillname);
+        break;
+    }
+  }
+
+  public void FogENH(int skillID)
+  {
+    switch (skillID)
+    {
+      case 0:
+        if (this.useMP > this.PTstetas.partystatus[1].MP)
+          break;
+        this.partycle = (GameObject) UnityEngine.Resources.Load("particle/BattleGear-Sword");
+        this.PTstetas.Andead = 5;
+        this.Info.text = "フォグはヴァルハラの盾を解放した";
+        this.Selectreset(this.Charactionskillname);
+        this.EffectMotion(2, 1);
+        break;
+      case 1:
+        if (this.useMP > this.PTstetas.partystatus[1].MP)
+          break;
+        this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Soul mobile");
+        this.Info.text = "カウンター";
+        this.Selectreset(this.Charactionskillname);
+        this.EffectMotion(2, 1);
+        break;
+      case 2:
+        if (this.useMP > this.PTstetas.partystatus[1].MP)
+          break;
+        this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Fog");
+        for (this.i = 0; this.i < 4; ++this.i)
+        {
+          if (this.menu.charpartyflag[this.i] && this.PTstetas.partystatus[this.i].HP > 0)
+            this.PTstetas.genkaku[this.i] = true;
+        }
+        this.Info.text = "味方が幻覚に守られる";
+        this.Selectreset(this.Charactionskillname);
+        this.EffectMotion(1, 1);
+        break;
+    }
+  }
+
+  public void RanENH(int skillID)
+  {
+    switch (skillID)
+    {
+      case 0:
+        if (this.PTstetas.ether <= 0)
+          this.condition.ConditionparticleSet(7, 2);
+        this.PTstetas.ether += 5;
+        this.Selectreset(this.Charactionskillname);
+        this.partycle = (GameObject) UnityEngine.Resources.Load("particle/MagicRune");
+        this.EffectMotion(2, 2);
+        this.Info.text = "ランはエーテルを溜めた";
+        break;
+      case 1:
+        if (this.PTstetas.partystatus[2].MP >= this.useMP)
+        {
+          this.magic_stance = this.PTskill.Skilllean_bool[2, 2, 7] != 1 ? (this.PTskill.Skilllean_bool[2, 2, 6] != 1 ? 1 : 3) : 5;
+          this.Selectreset(this.Charactionskillname);
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/EnergyField");
+          this.EffectMotion(1, 2);
+          this.Info.text = "味方の攻撃に魔法属性が付いた";
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+      case 2:
+        if (this.PTstetas.partystatus[2].MP >= this.useMP)
+        {
+          this.usemp_zero = this.PTskill.Skilllean_bool[2, 2, 9] != 1 ? (this.PTskill.Skilllean_bool[2, 1, 8] != 1 ? 1 : 3) : 5;
+          this.Selectreset(this.Charactionskillname);
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/ElementalBall");
+          this.EffectMotion(1, 2);
+          this.Info.text = "味方の消費MPが0になる";
+          break;
+        }
+        this.Info.text = "MPが足りません";
+        break;
+    }
+  }
+
+  public void MidoENH(int skillID)
+  {
+    switch (skillID)
+    {
+      case 0:
+        this.drivup = this.PTskill.Skilllean_bool[3, 2, 5] != 1 ? (this.PTskill.Skilllean_bool[3, 2, 4] != 1 ? 0.1f : 0.2f) : 0.3f;
+        this.PTstetas.Drivegage += 0.3f;
+        this.Selectreset(this.Charactionskillname);
+        this.partycle = (GameObject) UnityEngine.Resources.Load("particle/LightningCloud");
+        this.EffectMotion(1, 3);
+        this.Info.text = "ドライブゲージが上昇した";
+        break;
+      case 1:
+        this.dexupturn = 3;
+        this.PTstetas.dexup = this.PTskill.Skilllean_bool[3, 2, 7] != 1 ? (this.PTskill.Skilllean_bool[3, 2, 6] != 1 ? 10 : 30) : 50;
+        this.Selectreset(this.Charactionskillname);
+        this.EffectMotion(2, 3);
+        this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Flame-1-Particles");
+        this.EffectMotion(1, 3);
+        this.Info.text = "敏捷度が上がった";
+        break;
+      case 2:
+        int num = this.PTskill.Skilllean_bool[3, 2, 9] != 1 ? (this.PTskill.Skilllean_bool[3, 2, 8] != 1 ? 800 : 1000) : 2000;
+        this.batllemanager.getexp += num;
+        this.batllemanager.getmony += num;
+        this.Selectreset(this.Charactionskillname);
+        this.EffectMotion(1, 3);
+        this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Flame-1-Particles");
+        this.EffectMotion(1, 3);
+        this.Info.GetComponent<Text>().text = "経験値と獲得金が増えた";
+        break;
+    }
+  }
+
+  public void OnClick_JAM()
+  {
+    this.Charactionskillname = this.Charactionskillname = this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillname[this.PTskill.setskill_jam[this.batllemanager.comandmember]].ToString();
+    this.batllemanager.ptmotion[this.batllemanager.comandmember].SetFloat("JAM", 3f);
+    if (this.batllemanager.comandmember == 0)
+      this.IvanJAM(this.PTskill.setskill_jam[this.batllemanager.comandmember]);
+    else if (this.batllemanager.comandmember == 1)
+      this.FogJAM(this.PTskill.setskill_jam[this.batllemanager.comandmember]);
+    else if (this.batllemanager.comandmember == 2)
+    {
+      this.RanJAM(this.PTskill.setskill_jam[this.batllemanager.comandmember]);
+    }
+    else
+    {
+      if (this.batllemanager.comandmember != 3)
+        return;
+      this.MidoJAM(this.PTskill.setskill_jam[this.batllemanager.comandmember]);
+    }
+  }
+
+  public void IvanJAM(int skillID)
+  {
+    if (skillID == 0 || skillID == 1)
+      return;
+    if (skillID == 2)
+    {
+      this.damage = this.PTskill.Skilllean_bool[0, 3, 9] != 1 ? (this.PTskill.Skilllean_bool[0, 3, 8] != 1 ? this.PTstetas.partystatus[0].INT * 10 : this.PTstetas.partystatus[0].INT * 10) : this.PTstetas.partystatus[0].INT * 10;
+      if (this.PTstetas.partystatus[0].MP >= this.useMP)
+      {
+        for (this.i = 0; this.i < 3; ++this.i)
+        {
+          if (this.batllemanager.enemyCopy_[this.i].HP > 0)
+          {
+            this.damage -= this.batllemanager.enemyCopy_[this.i].magiccut;
+            if (this.damage <= 0)
+              this.damage = 0;
+            this.batllemanager.DamageTextpop(this.damage, 1, this.i);
+            this.batllemanager.enemyCopy_[this.i].HP -= this.damage;
+          }
+          if (this.menu.charpartyflag[this.i])
+          {
+            this.damage -= this.PTstetas.partystatus[this.i].INT * 2;
+            this.batllemanager.DamageTextpop(this.damage, 3, this.i);
+            this.PTstetas.partystatus[this.i].HP -= this.damage;
+          }
+        }
+        this.Selectreset(this.Charactionskillname);
+        this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Flame-1-Particles");
+        this.EffectMotion(0, 0);
+        this.EffectMotion(1, 0);
+        this.Info.text = "フィールド全体に" + (object) this.damage + "のダメージを与えた";
+      }
+      else
+        this.Info.text = "MPが足りません";
+    }
+    else if (skillID == 3 || skillID == 12 || (skillID == 14 || skillID == 15) || (skillID == 16 || skillID != 18))
+      ;
+  }
+
+  public void FogJAM(int skillID)
+  {
+    switch (skillID)
+    {
+      case 0:
+        float num = Random.Range(0.0f, 0.3f);
+        this.damage = (this.PTstetas.partystatus[1].maxHP - this.PTstetas.partystatus[1].HP) * 2;
+        if ((double) this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].HP / (double) this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].maxHP <= (double) num)
+        {
+          this.damage = this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].HP;
+          if (this.damage <= 0)
+            this.damage = 0;
+        }
+        this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].HP -= this.damage;
+        this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Flame-1-Particles");
+        this.EffectMotion(1, 0);
+        this.batllemanager.DamageTextpop(this.damage, 1, this.i);
+        this.Info.text = "フォグは吹雪を放った";
+        this.Selectreset(this.Charactionskillname);
+        break;
+      case 1:
+        this.hubukislow = true;
+        this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Flame-1-Particles");
+        this.EffectMotion(1, 0);
+        this.Info.text = "フォグは奈落を放った\n数ターン後に敵全体へスロウ効果";
+        this.Selectreset(this.Charactionskillname);
+        break;
+      case 2:
+        this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].condition_bakusan += 3;
+        this.damage = this.PTstetas.partystatus[1].power + this.PTstetas.partystatus[1].INT / 2;
+        if (this.damage <= 0)
+          this.damage = 0;
+        this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].HP -= this.damage;
+        this.partycle = (GameObject) UnityEngine.Resources.Load("particle/BattleGear-Sword");
+        this.EffectMotion(1, 0);
+        this.batllemanager.DamageTextpop(this.damage, 0, this.i);
+        this.Info.text = "フォグは紅蓮を放った\n敵は爆散状態になった";
+        this.Selectreset(this.Charactionskillname);
+        break;
+    }
+  }
+
+  public void RanJAM(int skillID)
+  {
+    if (skillID == 0)
+    {
+      if (this.PTstetas.partystatus[2].MP >= this.useMP)
+      {
+        for (this.i = 0; this.i < 3; ++this.i)
+        {
+          this.damage = this.PTstetas.partystatus[2].INT / 3 * this.PTstetas.ether - this.batllemanager.enemyCopy_[this.i].magiccut;
+          this.batllemanager.DamageTextpop(this.damage, 1, this.i);
+          this.batllemanager.enemyCopy_[this.i].HP -= this.damage;
+        }
+        this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Flame-1-Particles");
+        this.EffectMotion(1, 0);
+        this.Info.text = "ランはアルテマを唱えた";
+        this.PTstetas.partystatus[2].MP -= 150;
+        this.Selectreset(this.Charactionskillname);
+      }
+      else
+        this.Info.text = "MPが足りません";
+    }
+    else if (skillID == 1 || skillID == 2 || (skillID == 3 || skillID == 12) || (skillID == 14 || skillID == 15 || (skillID == 16 || skillID != 18)))
+      ;
+  }
+
+  public void MidoJAM(int skillID)
+  {
+    if (skillID == 0 || skillID == 1 || (skillID == 2 || skillID == 3) || (skillID == 12 || skillID == 14 || (skillID == 15 || skillID == 16)) || skillID != 18)
+      ;
+  }
+
+  public float EnemyMagicCut(float damage_base)
+  {
+    damage_base *= (float) (1 - this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].defup / 100);
+    return damage_base;
+  }
+
+  public void All_Atack(int teikou1, int teikou2, int teikou3, int damagecut1, int damagecut2, int damagecut3, float powre, int allside)
+  {
+    if (this.batllemanager.enemyCopy_[0].HP > 0)
+    {
+      this.damage = (int) powre - teikou1 - damagecut1;
+      if (this.damage < 0)
+        this.damage = 0;
+      this.batllemanager.DamageTextpop(this.damage, 0, 0);
+      this.batllemanager.enemyCopy_[0].HP -= this.damage;
+    }
+    if (this.batllemanager.enemyCopy_[1].HP > 0)
+    {
+      this.damage = (int) powre - teikou2 - damagecut2;
+      if (this.damage < 0)
+        this.damage = 0;
+      this.batllemanager.DamageTextpop(this.damage, 0, 1);
+      this.batllemanager.enemyCopy_[1].HP -= this.damage;
+    }
+    if (this.batllemanager.enemyCopy_[2].HP > 0)
+    {
+      this.damage = (int) powre - teikou3 - damagecut3;
+      if (this.damage < 0)
+        this.damage = 0;
+      this.batllemanager.DamageTextpop(this.damage, 0, 2);
+      this.batllemanager.enemyCopy_[2].HP -= this.damage;
+    }
+    this.EffectMotion(allside, this.batllemanager.comandmember);
+  }
+
+  public void Solo_Atack(int teikou, int damagecut, float powre)
+  {
+    this.batllemanager.EnemrMarkar();
+    this.damage = (int) powre - teikou - damagecut;
+    if (this.damage < 0)
+      this.damage = 0;
+    this.batllemanager.DamageTextpop(this.damage, 0, this.batllemanager.enemyID_);
+    this.batllemanager.enemyCopy_[this.batllemanager.enemyID_].HP -= this.damage;
+    this.EffectMotion(4, this.batllemanager.comandmember);
+  }
+
+  public void DriveAct()
+  {
+    if (this.DriveName.text == this.PTskill.special[0])
+    {
+      for (this.i = 0; this.i < 4; ++this.i)
+      {
+        if (this.menu.charpartyflag[this.i])
+        {
+          this.PTstetas.partystatus[this.i].HP = this.PTstetas.partystatus[this.i].maxHP;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Water Splash soft");
+          Object.Destroy((Object) Object.Instantiate<GameObject>(this.partycle, this.batllemanager.PartyModel[this.i].transform.position, Quaternion.identity), 5f);
+        }
+      }
+      this.batllemanager.loop = true;
+      this.batllemanager.comandflag[0] = false;
+      this.batllemanager.CommandPanel_party[0].SetActive(false);
+      this.batllemanager.ATBbar_party[0].GetComponent<Image>().fillAmount = 0.0f;
+      this.SkillPanel.SetActive(false);
+    }
+    else if (this.DriveName.text == this.PTskill.special[2])
+    {
+      this.damage = this.PTstetas.partystatus[2].level * 10 + this.PTstetas.partystatus[2].INT * 300;
+      for (this.i = 0; this.i < 3; ++this.i)
+        this.batllemanager.enemyCopy_[this.i].HP -= this.damage;
+      this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Water Splash soft");
+      Object.Destroy((Object) Object.Instantiate<GameObject>(this.partycle, this.batllemanager.enemypos[1], Quaternion.identity), 5f);
+      this.PTstetas.Drivegage = 0.0f;
+      this.batllemanager.comandflag[2] = false;
+      this.batllemanager.CommandPanel_party[2].SetActive(false);
+      this.batllemanager.ATBbar_party[2].GetComponent<Image>().fillAmount = 0.0f;
+      this.SkillPanel.SetActive(false);
+    }
+    else
+    {
+      if (!(this.DriveName.text == this.PTskill.special[3]))
+        return;
+      this.damage = this.PTstetas.partystatus[3].level * 10 + this.PTstetas.partystatus[3].INT * 150;
+      for (this.i = 0; this.i < 3; ++this.i)
+      {
+        if (this.batllemanager.enemyCopy_[this.i].HP > 0)
+        {
+          this.batllemanager.enemyCopy_[this.i].HP -= this.damage - this.batllemanager.enemyCopy_[this.i].magiccut / 4;
+          this.partycle = (GameObject) UnityEngine.Resources.Load("particle/Water Splash soft");
+          Object.Destroy((Object) Object.Instantiate<GameObject>(this.partycle, this.batllemanager.PartyModel[this.i].transform.position, Quaternion.identity), 5f);
+        }
+        if (this.menu.charpartyflag[this.i] && this.PTstetas.partystatus[this.i].HP > 0)
+          this.PTstetas.partystatus[this.i].HP += this.PTstetas.partystatus[3].INT * 30;
+      }
+      this.PTstetas.Drivegage = 0.0f;
+      this.batllemanager.comandflag[3] = false;
+      this.batllemanager.CommandPanel_party[3].SetActive(false);
+      this.batllemanager.ATBbar_party[3].GetComponent<Image>().fillAmount = 0.0f;
+      this.SkillPanel.SetActive(false);
+    }
+  }
+
+  public void Selectreset(string Skillname)
+  {
+    this.PTstetas.partystatus[this.batllemanager.comandmember].MP -= this.useMP;
+    this.st = 100;
+    this.t = 0;
+    this.SkillPlate.text = Skillname;
+    this.batllemanager.select_mode = 0;
+    if (this.batllemanager.loop)
+    {
+      this.PTstetas.Drivegage -= 0.2f;
+      if ((double) this.PTstetas.Drivegage <= 0.0)
+      {
+        this.PTstetas.Drivegage = 0.0f;
+        this.batllemanager.loop = false;
+      }
+    }
+    else
+      this.PTstetas.Drivegage += 0.1f;
+    this.batllemanager.comandflag[this.batllemanager.comandmember] = false;
+    if (this.batllemanager.comandmember == 0)
+      this.CommandPanel_ivan.SetActive(false);
+    else if (this.batllemanager.comandmember == 1)
+      this.CommandPanel_fog.SetActive(false);
+    else if (this.batllemanager.comandmember == 2)
+      this.CommandPanel_ran.SetActive(false);
+    else if (this.batllemanager.comandmember == 3)
+      this.CommandPanel_mido.SetActive(false);
+    this.batllemanager.ATBbar_party[this.batllemanager.comandmember].GetComponent<Image>().fillAmount = 0.0f;
+    this.SkillPanel.SetActive(false);
+    --this.batllemanager.turnwait;
+  }
+
+  public int UseMPSet(int skillcomand, int skillID)
+  {
+    switch (skillcomand)
+    {
+      case 0:
+        this.useMP = skillID > 3 ? (skillID != 12 ? this.PTskill.charskilllist[this.batllemanager.comandmember].ATKSkillMP[skillID] : (this.PTskill.Skilllean_bool[this.batllemanager.comandmember, skillcomand, skillID + 1] != 1 ? this.PTskill.charskilllist[this.batllemanager.comandmember].ATKSkillMP[skillID] : this.PTskill.charskilllist[this.batllemanager.comandmember].ATKSkillMP[skillID + 1])) : (this.PTskill.Skilllean_bool[this.batllemanager.comandmember, skillcomand, skillID + 4 + skillID * 2 + 1] != 1 ? (this.PTskill.Skilllean_bool[this.batllemanager.comandmember, skillcomand, skillID + 4 + skillID] != 1 ? this.PTskill.charskilllist[this.batllemanager.comandmember].ATKSkillMP[skillID] : this.PTskill.charskilllist[this.batllemanager.comandmember].ATKSkillMP[skillID + 4 + skillID * 2]) : this.PTskill.charskilllist[this.batllemanager.comandmember].ATKSkillMP[skillID + 4 + skillID * 2 + 1]);
+        break;
+      case 1:
+        this.useMP = skillID > 3 ? (skillID != 12 ? (skillID != 16 ? this.PTskill.charskilllist[this.batllemanager.comandmember].DEFSkillMP[skillID] : (this.PTskill.Skilllean_bool[this.batllemanager.comandmember, skillcomand, skillID + 1] != 1 ? this.PTskill.charskilllist[this.batllemanager.comandmember].DEFSkillMP[16] : this.PTskill.charskilllist[this.batllemanager.comandmember].DEFSkillMP[17])) : (this.PTskill.Skilllean_bool[this.batllemanager.comandmember, skillcomand, skillID + 1] != 1 ? this.PTskill.charskilllist[this.batllemanager.comandmember].DEFSkillMP[12] : this.PTskill.charskilllist[this.batllemanager.comandmember].DEFSkillMP[13])) : (this.PTskill.Skilllean_bool[this.batllemanager.comandmember, skillcomand, skillID + 4 + skillID * 2 + 1] != 1 ? (this.PTskill.Skilllean_bool[this.batllemanager.comandmember, skillcomand, skillID + 4 + skillID * 2 + 1] != 1 ? this.PTskill.charskilllist[this.batllemanager.comandmember].DEFSkillMP[skillID] : this.PTskill.charskilllist[this.batllemanager.comandmember].DEFSkillMP[skillID + 4 + skillID * 2]) : this.PTskill.charskilllist[this.batllemanager.comandmember].DEFSkillMP[skillID + 4 + skillID * 2 + 1]);
+        break;
+      case 2:
+        this.useMP = skillID > 3 ? (skillID != 12 ? (skillID != 16 ? this.PTskill.charskilllist[this.batllemanager.comandmember].ENHSkillMP[skillID] : (this.PTskill.Skilllean_bool[this.batllemanager.comandmember, skillcomand, skillID + 1] != 1 ? this.PTskill.charskilllist[this.batllemanager.comandmember].ENHSkillMP[16] : this.PTskill.charskilllist[this.batllemanager.comandmember].ENHSkillMP[17])) : (this.PTskill.Skilllean_bool[this.batllemanager.comandmember, skillcomand, skillID + 1] != 1 ? this.PTskill.charskilllist[this.batllemanager.comandmember].ENHSkillMP[12] : this.PTskill.charskilllist[this.batllemanager.comandmember].ENHSkillMP[13])) : (this.PTskill.Skilllean_bool[this.batllemanager.comandmember, skillcomand, skillID + 4 + skillID * 2 + 1] != 1 ? (this.PTskill.Skilllean_bool[this.batllemanager.comandmember, skillcomand, skillID + 4 + skillID * 2] != 1 ? this.PTskill.charskilllist[this.batllemanager.comandmember].ENHSkillMP[skillID] : this.PTskill.charskilllist[this.batllemanager.comandmember].ENHSkillMP[skillID + 4 + skillID * 2 + 1]) : this.PTskill.charskilllist[this.batllemanager.comandmember].ENHSkillMP[skillID + 4 + skillID * 2 + 1]);
+        break;
+      case 3:
+        this.useMP = skillID > 3 ? (skillID != 12 ? (skillID != 16 ? this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[skillID] : (this.PTskill.Skilllean_bool[this.batllemanager.comandmember, skillcomand, skillID + 1] != 1 ? this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[16] : this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[17])) : (this.PTskill.Skilllean_bool[this.batllemanager.comandmember, skillcomand, skillID + 1] != 1 ? this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[12] : this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[13])) : (this.PTskill.Skilllean_bool[this.batllemanager.comandmember, skillcomand, skillID + 4 + skillID * 2 + 1] != 1 ? (this.PTskill.Skilllean_bool[this.batllemanager.comandmember, skillcomand, skillID + 4 + skillID * 2] != 1 ? this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[skillID] : this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[skillID + 4 + skillID * 2 + 1]) : this.PTskill.charskilllist[this.batllemanager.comandmember].JAMSkillMP[skillID + 4 + skillID * 2 + 1]);
+        break;
+    }
+    if (this.batllemanager.comandmember == 0 && this.PTstetas.fillseal > 0)
+      this.useMP -= this.PTstetas.partystatus[0].MP / 3;
+    if (this.usemp_zero > 0)
+      this.useMP = 0;
+    return this.useMP;
+  }
+
+  public void AllorSolo(int enemy_teikou1, int enemy_teikou2, int enemy_teikou3, int enemy_damagecut1, int enemy_damagecut2, int enemy_damagecut3, int target_teikou, int target_damagecut, float basaldamage, int targetside)
+  {
+    if (this.PTstetas.aura)
+    {
+      this.EffectMotion(0, 0);
+      this.All_Atack(enemy_teikou1, enemy_teikou2, enemy_teikou3, enemy_damagecut1, enemy_damagecut2, enemy_damagecut3, basaldamage, targetside);
+    }
+    else
+      this.Solo_Atack(target_teikou, target_damagecut, basaldamage);
+    this.PTstetas.aura = false;
+  }
+
+  public void EffectMotion(int all, int mypos)
+  {
+    if (this.systemmenu.batllefect)
+      return;
+    switch (all)
+    {
+      case 0:
+        for (this.i = 0; this.i < 3; ++this.i)
+        {
+          if (this.batllemanager.enemyCopy_[this.i].HP > 0)
+          {
+            GameObject gameObject = Object.Instantiate<GameObject>(this.partycle);
+            gameObject.transform.position = this.batllemanager.enemypos[this.i];
+            Object.Destroy((Object) gameObject.gameObject, 3f);
+          }
+        }
+        break;
+      case 1:
+        for (this.i = 0; this.i < 4; ++this.i)
+        {
+          if (this.menu.charpartyflag[this.i] && this.PTstetas.partystatus[this.i].HP > 0)
+            Object.Destroy((Object) Object.Instantiate<GameObject>(this.partycle, this.batllemanager.PartyModel[this.i].transform.position, Quaternion.identity), 2f);
+        }
+        break;
+      case 2:
+        Object.Destroy((Object) Object.Instantiate<GameObject>(this.partycle, this.batllemanager.PartyModel[mypos].transform.position, Quaternion.identity), 2f);
+        break;
+      default:
+        GameObject gameObject1 = Object.Instantiate<GameObject>(this.partycle);
+        gameObject1.transform.position = this.batllemanager.enemypos[this.batllemanager.enemyID_];
+        Object.Destroy((Object) gameObject1.gameObject, 3f);
+        break;
+    }
+  }
+}

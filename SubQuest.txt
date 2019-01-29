@@ -1,0 +1,122 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class SubQuest : MonoBehaviour
+{
+  private int time = 250;
+  private GameObject manager;
+  private ScrollController subquecontroll;
+  private MenuOpen menu;
+  private ItemList itemlis;
+  public GameObject Talkwindow;
+  public GameObject NPCwindow;
+  public Text talktext;
+  public int Questcount;
+  private int t;
+  private bool substorytalking;
+  public int questID;
+  public int needstory;
+  private bool questup;
+
+  private void Start()
+  {
+    this.manager = GameObject.Find("GameManager");
+    this.subquecontroll = this.manager.GetComponent<ScrollController>();
+    this.menu = this.manager.GetComponent<MenuOpen>();
+    this.itemlis = this.manager.GetComponent<ItemList>();
+  }
+
+  private void Update()
+  {
+    if (this.questID != 0 || this.itemlis.itemhave_con[0] < 5 || this.subquecontroll.Qest_clearcount[this.questID] != 1)
+      return;
+    this.subquecontroll.Qest_clearcount[this.questID] = 2;
+  }
+
+  private void OnTriggerEnter(Collider other)
+  {
+    if (!(other.tag == "Player") || this.menu.talkflag || (this.needstory > this.menu.story || this.subquecontroll.QestClearflag[this.questID]) || this.subquecontroll.Qest_clearcount[this.questID] != 0 && this.subquecontroll.Qest_clearcount[this.questID] != this.Questcount)
+      return;
+    this.questup = true;
+  }
+
+  private void OnTriggerExit(Collider other)
+  {
+    if (!(other.tag == "Player"))
+      return;
+    this.questup = false;
+  }
+
+  private void OnGUI()
+  {
+    if (this.questup && GUI.Button(new Rect(0.0f, 0.0f, 200f, 30f), "サブクエスト:" + this.subquecontroll.Qest_title[this.questID]))
+    {
+      this.t = 0;
+      this.NPCwindow.SetActive(false);
+      this.substorytalking = true;
+    }
+    if (!this.substorytalking)
+      return;
+    this.menu.talkflag = true;
+    this.Talkwindow.SetActive(true);
+    this.SubQuestStory();
+  }
+
+  public void SubQuestStory()
+  {
+    if (this.questID != 0)
+      return;
+    ++this.t;
+    this.questup = false;
+    if (this.subquecontroll.Qest_clearcount[this.questID] == 0)
+    {
+      if (this.t <= this.time)
+        this.talktext.text = "エリン\nあら、イヴァン。旅は順調かしら？";
+      else if (this.t <= this.time * 2)
+        this.talktext.text = "エリン\nいつ怪我をするか分からないから道具はちゃんと揃えておくのよ";
+      else if (this.t <= this.time * 3)
+        this.talktext.text = "エリン\nせっかく村に寄ったのなら薬草を買っておくのよ？";
+      else if (this.t <= this.time * 4)
+        this.talktext.text = "一部のNPCは近づくと会話と共に「サブクエスト」を受注できることがあります。";
+      else if (this.t <= this.time * 5)
+        this.talktext.text = "条件やストーリーの進行度で出現することもあります。\n主に、メインストーリーで語られないストーリーを進めていくことになります";
+      else if (this.t <= this.time * 6)
+      {
+        this.talktext.text = "サブクエスト:" + this.subquecontroll.Qest_title[this.questID] + "\n";
+      }
+      else
+      {
+        this.subquecontroll.Qest_clearcount[this.questID] = 1;
+        this.Talkwindow.SetActive(false);
+        this.NPCwindow.SetActive(true);
+        this.menu.talkflag = false;
+        this.substorytalking = false;
+      }
+    }
+    if (this.subquecontroll.Qest_clearcount[this.questID] != this.Questcount)
+      return;
+    if (this.t <= this.time)
+      this.talktext.text = "エリン\nおかえりなさい、ちゃんと道具の整理はしてる？";
+    else if (this.t <= this.time * 2)
+      this.talktext.text = "エリン\nあら、ちゃんと出来てるみたいね。エライエライ";
+    else if (this.t <= this.time * 3)
+      this.talktext.text = "エリン\nいつ何が起こるか分からないんだから、準備だけはしっかりしておくのよ？使えるものは多いほうがいいんだから";
+    else if (this.t <= this.time + 4)
+      this.talktext.text = "サブクエスト:" + this.subquecontroll.Qest_title[this.questID] + "  クリア！！";
+    else if (this.t <= this.time * 5)
+    {
+      this.talktext.text = "報酬:薬草　5個　抜けた毒針　10個　入手した！";
+    }
+    else
+    {
+      this.subquecontroll.Qest_clearcount[this.questID] = 3;
+      this.subquecontroll.QestClearflag[this.questID] = true;
+      this.NPCwindow.SetActive(true);
+      this.itemlis.itemhave_con[0] += 5;
+      this.itemlis.itemhave_mat[3] += 10;
+      this.Talkwindow.SetActive(false);
+      this.menu.talkflag = false;
+      this.substorytalking = false;
+    }
+  }
+}

@@ -1,0 +1,171 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class PalamateMenu : MonoBehaviour
+{
+  private int waitime = 0;
+  private string[] passive_description = new string[4]
+  {
+    "フィールシール\n自身が異常状態の時防御力が下がるが消費MPが減る。",
+    "リザイン\n味方の戦闘不能数によって攻撃力上昇。防御力が下がる。",
+    "エーテル\n魔法攻撃に必要。\n魔法攻撃をするたび消費される。",
+    "水神の加護\n自身が瀕死状態の時、回避率と敏捷度が上がる。"
+  };
+  private string[] drivskilltext = new string[4]
+  {
+    "ループ\n5回行動するまで敵のATBゲージをストップさせる",
+    "",
+    "エレメンタルブラスト\n敵全体に防御無視の無属性魔法攻撃",
+    ""
+  };
+  private PartyStetus PTste;
+  private MenuOpen menu;
+  private WeponMenu weponmenu;
+  private WeponList weponlis;
+  public GameObject HPImage;
+  public GameObject MPImage;
+  private Image HPbar;
+  private Image MPber;
+  public Sprite[] party_texture;
+  public Text HPtext;
+  public Text MPtext;
+  public GameObject charglaph;
+  public Text passiveskill;
+  public Image passiv_Icon;
+  public Sprite[] passivIcon;
+  private Image CharGlaph;
+  public GameObject Nameplat;
+  public GameObject Leveltext;
+  public GameObject POwText;
+  public GameObject DefText;
+  public GameObject INTText;
+  public GameObject DexText;
+  public GameObject WeponText;
+  public GameObject Acsetext;
+  public GameObject EXPtext;
+  private Text nameplate;
+  private Text level;
+  private Text power;
+  private Text deff;
+  private Text Int;
+  private Text dex;
+  private Text weponte;
+  private Text acsetex;
+  private Text EXP;
+  private string Name;
+  private int _level;
+  private int _HP;
+  private int _maxHP;
+  private int _MP;
+  private int _maxMP;
+  private int _power;
+  private int _deff;
+  private int _INT;
+  private int _needexp;
+  private int _havexp;
+  private float _dex;
+
+  private void Start()
+  {
+    this.PTste = this.GetComponent<PartyStetus>();
+    this.menu = this.GetComponent<MenuOpen>();
+    this.weponmenu = this.GetComponent<WeponMenu>();
+    this.weponlis = this.GetComponent<WeponList>();
+    this.HPbar = this.HPImage.GetComponent<Image>();
+    this.MPber = this.MPImage.GetComponent<Image>();
+    this.CharGlaph = this.charglaph.GetComponent<Image>();
+    this.nameplate = this.Nameplat.GetComponent<Text>();
+    this.level = this.Leveltext.GetComponent<Text>();
+    this.power = this.POwText.GetComponent<Text>();
+    this.deff = this.DefText.GetComponent<Text>();
+    this.Int = this.INTText.GetComponent<Text>();
+    this.dex = this.DexText.GetComponent<Text>();
+    this.EXP = this.EXPtext.GetComponent<Text>();
+    this.weponte = this.WeponText.GetComponent<Text>();
+    this.acsetex = this.Acsetext.GetComponent<Text>();
+  }
+
+  private void Update()
+  {
+    if (this.menu.menuID == 6)
+    {
+      ++this.waitime;
+      if (this.waitime >= 20)
+      {
+        if (Input.GetButtonDown("Fire5"))
+        {
+          this.waitime = 0;
+          if (this.menu.charselect_x > 0)
+            --this.menu.charselect_x;
+        }
+        if (Input.GetButtonDown("Fire6"))
+        {
+          this.waitime = 0;
+          if (this.menu.charselect_x < 3)
+            ++this.menu.charselect_x;
+        }
+      }
+    }
+    this.PartyGUI();
+  }
+
+  public void PartyGUI()
+  {
+    if (this.menu.menuID != 6)
+      return;
+    this.StetusSet(this.PTste.partystatus[this.menu.charselect_x].name, this.PTste.partystatus[this.menu.charselect_x].level, this.PTste.partystatus[this.menu.charselect_x].HP, this.PTste.partystatus[this.menu.charselect_x].maxHP, this.PTste.partystatus[this.menu.charselect_x].MP, this.PTste.partystatus[this.menu.charselect_x].maxMP, this.PTste.partystatus[this.menu.charselect_x].power, this.PTste.partystatus[this.menu.charselect_x].deff, this.PTste.partystatus[this.menu.charselect_x].INT, this.PTste.partystatus[this.menu.charselect_x].dex, (float) this.PTste.partystatus[this.menu.charselect_x].needexp, this.PTste.partystatus[this.menu.charselect_x].haveexp);
+    if (this.menu.charpartyflag[this.menu.charselect_x])
+    {
+      this.CharGlaph.sprite = this.party_texture[this.menu.charselect_x];
+      this.HPbar.fillAmount = (float) this._HP / (float) this._maxHP;
+      this.HPtext.text = this._HP.ToString() + "/" + (object) this._maxHP;
+      this.MPtext.text = this._MP.ToString() + "/" + (object) this._maxMP;
+      this.MPber.fillAmount = (float) this._MP / (float) this._maxMP;
+      if (this.menu.charselect_x == 0 && this.menu.charpartyflag[0])
+      {
+        this.weponte.text = "" + this.weponlis.nih_name[this.weponmenu.nowID[0]];
+        this.acsetex.text = "" + this.weponlis.acsename[this.weponmenu.setID[0]];
+      }
+      if (this.menu.charselect_x == 1 && this.menu.charpartyflag[1])
+      {
+        this.weponte.text = "" + this.weponlis.sword_name[this.weponmenu.nowID[1]];
+        this.acsetex.text = "" + this.weponlis.acsename[this.weponmenu.setID[1]];
+      }
+      if (this.menu.charselect_x == 2 && this.menu.charpartyflag[2])
+      {
+        this.weponte.text = "" + this.weponlis.staff_name[this.weponmenu.nowID[2]];
+        this.acsetex.text = "" + this.weponlis.acsename[this.weponmenu.setID[2]];
+      }
+      if (this.menu.charselect_x == 3 && this.menu.charpartyflag[3])
+      {
+        this.weponte.text = "" + this.weponlis.gun_name[this.weponmenu.nowID[3]];
+        this.acsetex.text = "" + this.weponlis.acsename[this.weponmenu.setID[3]];
+      }
+      this.nameplate.text = this.Name;
+      this.level.text = " Level: " + (object) this._level;
+      this.power.text = "攻撃力: " + (object) this._power;
+      this.deff.text = "防御力: " + (object) this._deff;
+      this.Int.text = "精神力: " + (object) this._INT;
+      this.dex.text = "敏捷度: " + this._dex.ToString("f2");
+      this.EXP.text = "次のレベルまで　" + (object) (this._needexp - this._havexp);
+      this.passiveskill.text = this.passive_description[this.menu.charselect_x] + "\n" + this.drivskilltext[this.menu.charselect_x];
+      this.passiv_Icon.sprite = this.passivIcon[this.menu.charselect_x];
+    }
+  }
+
+  public void StetusSet(string name, int level, int HP, int maxHP, int MP, int maxMP, int power, int deff, int INT, float dex, float needexp, int havexp)
+  {
+    this._level = level;
+    this.Name = name;
+    this._HP = HP;
+    this._maxHP = maxHP;
+    this._MP = MP;
+    this._maxMP = maxMP;
+    this._power = power;
+    this._deff = deff;
+    this._INT = INT;
+    this._dex = dex;
+    this._needexp = (int) needexp;
+    this._havexp = havexp;
+  }
+}

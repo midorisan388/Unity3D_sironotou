@@ -1,0 +1,14 @@
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class outareaScript : MonoBehaviour
+{
+  public int scene;
+
+  private void OnTriggerEnter(Collider myCollider)
+  {
+    if (!(myCollider.tag == "Player"))
+      return;
+    SceneManager.LoadScene(this.scene);
+  }
+}

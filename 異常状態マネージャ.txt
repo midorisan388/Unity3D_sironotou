@@ -1,0 +1,282 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class ConditionController : MonoBehaviour
+{
+  private int[] setx = new int[4];
+  private PartyStetus ptste;
+  private Playerturn_skilleffect plyskill;
+  private BattleturnManager batllemana;
+  private SystemMenu system;
+  [SerializeField]
+  private Text waitcharcondition;
+  public bool[] offpoison;
+  public bool[] offpriz;
+  public bool[] offcharm;
+  public bool[] offsleep;
+  public bool[] offbrin;
+  public bool[] charbuffoff;
+  [SerializeField]
+  private Sprite[] conditionimage;
+  public RectTransform contant;
+  private GameObject _child;
+  public GameObject[] conditionpanel_parent;
+  [SerializeField]
+  private GameObject poisonparticle;
+  [SerializeField]
+  private GameObject prizeparticle;
+  [SerializeField]
+  private GameObject brinparticle;
+  [SerializeField]
+  private GameObject charmparticle;
+  [SerializeField]
+  private GameObject sleepparticle;
+  [SerializeField]
+  private GameObject fealseelparticle;
+  [SerializeField]
+  private GameObject andeadparticle;
+  [SerializeField]
+  private GameObject etherparticle;
+  [SerializeField]
+  private GameObject suijinparticle;
+
+  private void Start()
+  {
+    this.ptste = GameObject.Find("GameManager").GetComponent<PartyStetus>();
+    this.system = GameObject.Find("GameManager").GetComponent<SystemMenu>();
+    this.plyskill = GameObject.Find("BattleManager").GetComponent<Playerturn_skilleffect>();
+    this.batllemana = GameObject.Find("BattleManager").GetComponent<BattleturnManager>();
+  }
+
+  public void ConditionparticleSet(int conditionID, int member)
+  {
+    if (this.system.batllefect)
+      return;
+    this.ConditionImageSet(conditionID, member);
+    switch (conditionID)
+    {
+      case 0:
+        GameObject gameObject1 = Object.Instantiate<GameObject>(this.poisonparticle);
+        gameObject1.name = "poison" + (object) member;
+        gameObject1.transform.position = this.batllemana.partypos[member];
+        this.offpoison[member] = true;
+        break;
+      case 1:
+        GameObject gameObject2 = Object.Instantiate<GameObject>(this.prizeparticle);
+        gameObject2.name = "priz" + (object) member;
+        gameObject2.transform.position = this.batllemana.partypos[member];
+        this.offpriz[member] = true;
+        break;
+      case 2:
+        GameObject gameObject3 = Object.Instantiate<GameObject>(this.sleepparticle);
+        gameObject3.name = "sleep" + (object) member;
+        gameObject3.transform.position = this.batllemana.partypos[member];
+        this.offsleep[member] = true;
+        break;
+      case 3:
+        GameObject gameObject4 = Object.Instantiate<GameObject>(this.brinparticle);
+        gameObject4.name = "brin" + (object) member;
+        gameObject4.transform.position = this.batllemana.partypos[member];
+        this.offbrin[member] = true;
+        break;
+      case 4:
+        GameObject gameObject5 = Object.Instantiate<GameObject>(this.charmparticle);
+        gameObject5.name = "brin" + (object) member;
+        gameObject5.transform.position = this.batllemana.partypos[member];
+        this.offcharm[member] = true;
+        break;
+      case 5:
+        if (!this.charbuffoff[0])
+        {
+          GameObject gameObject6 = Object.Instantiate<GameObject>(this.fealseelparticle);
+          gameObject6.name = "feel0";
+          gameObject6.transform.position = this.batllemana.partypos[0];
+          this.charbuffoff[0] = true;
+          break;
+        }
+        break;
+      case 6:
+        GameObject gameObject7 = Object.Instantiate<GameObject>(this.andeadparticle);
+        gameObject7.name = "andead1";
+        gameObject7.transform.position = this.batllemana.partypos[1];
+        this.charbuffoff[1] = true;
+        break;
+      case 7:
+        GameObject gameObject8 = Object.Instantiate<GameObject>(this.etherparticle);
+        gameObject8.name = "ether2";
+        gameObject8.transform.position = this.batllemana.partypos[2];
+        this.charbuffoff[2] = true;
+        break;
+      case 8:
+        GameObject gameObject9 = Object.Instantiate<GameObject>(this.suijinparticle);
+        gameObject9.name = "suijin3";
+        gameObject9.transform.position = this.batllemana.partypos[3];
+        this.charbuffoff[3] = true;
+        break;
+    }
+  }
+
+  public void Destroyparticle(int member)
+  {
+    if (this.system.batllefect)
+      return;
+    if (this.ptste.partystatus[member].condition_pos <= 0 && this.offpoison[member])
+    {
+      Object.Destroy((Object) GameObject.Find("poison" + (object) member));
+      Object.Destroy((Object) this.conditionpanel_parent[member].transform.Find("condition" + (object) 0 + "_" + (object) member).gameObject);
+      this.offpoison[member] = false;
+    }
+    if (this.ptste.partystatus[member].condition_pri <= 0 && this.offpriz[member])
+    {
+      Object.Destroy((Object) GameObject.Find("priz" + (object) member));
+      Object.Destroy((Object) this.conditionpanel_parent[member].transform.Find("condition" + (object) 1 + "_" + (object) member).gameObject);
+      this.offpriz[member] = false;
+    }
+    if (this.ptste.partystatus[member].condition_sleeep <= 0 && this.offsleep[member])
+    {
+      Object.Destroy((Object) GameObject.Find("sleep" + (object) member));
+      Object.Destroy((Object) this.conditionpanel_parent[member].transform.Find("condition" + (object) 2 + "_" + (object) member).gameObject);
+      this.offsleep[member] = false;
+    }
+    if (this.ptste.partystatus[member].condition_brin <= 0 && this.offbrin[member])
+    {
+      Object.Destroy((Object) GameObject.Find("brin" + (object) member));
+      Object.Destroy((Object) this.conditionpanel_parent[member].transform.Find("condition" + (object) 3 + "_" + (object) member).gameObject);
+      this.offbrin[member] = false;
+    }
+    if (this.ptste.partystatus[member].condition_charm <= 0 && this.offcharm[member])
+    {
+      Object.Destroy((Object) GameObject.Find("charm" + (object) member));
+      Object.Destroy((Object) this.conditionpanel_parent[member].transform.Find("condition" + (object) 4 + "_" + (object) member).gameObject);
+      this.offcharm[member] = false;
+    }
+    switch (member)
+    {
+      case 0:
+        if (this.ptste.fillseal < 0)
+          this.ptste.fillseal = 0;
+        if (this.ptste.fillseal == 0 && member == 0 && this.charbuffoff[0])
+        {
+          Object.Destroy((Object) GameObject.Find("feel0"));
+          Object.Destroy((Object) this.conditionpanel_parent[0].transform.Find("condition" + (object) 5 + "_" + (object) member).gameObject);
+          this.charbuffoff[0] = false;
+          break;
+        }
+        break;
+      case 1:
+        if (this.ptste.Andead <= 0 && this.charbuffoff[1])
+        {
+          Object.Destroy((Object) GameObject.Find("andead1"));
+          Object.Destroy((Object) this.conditionpanel_parent[1].transform.Find("condition" + (object) 6 + "_" + (object) member).gameObject);
+          this.charbuffoff[1] = false;
+          break;
+        }
+        break;
+      case 2:
+        if (this.ptste.ether <= 0 && this.charbuffoff[2])
+        {
+          Object.Destroy((Object) GameObject.Find("ether2"));
+          Object.Destroy((Object) this.conditionpanel_parent[2].transform.Find("condition" + (object) 7 + "_" + (object) member).gameObject);
+          this.charbuffoff[2] = false;
+          break;
+        }
+        break;
+      case 3:
+        if ((double) this.ptste.suijin <= 0.0 && this.charbuffoff[3])
+        {
+          Object.Destroy((Object) GameObject.Find("suijin3"));
+          Object.Destroy((Object) this.conditionpanel_parent[3].transform.Find("condition" + (object) 8 + "_" + (object) member).gameObject);
+          this.charbuffoff[3] = false;
+          break;
+        }
+        break;
+    }
+  }
+
+  public void ConditionImageSet(int conditionID, int member)
+  {
+    RectTransform rectTransform = Object.Instantiate<RectTransform>(this.contant);
+    rectTransform.name = "condition" + (object) conditionID + "_" + (object) member;
+    rectTransform.GetComponent<Image>().sprite = this.conditionimage[conditionID];
+    rectTransform.SetParent(this.conditionpanel_parent[member].transform, false);
+  }
+
+  public void ConditionText(int charID)
+  {
+    this.waitcharcondition.text = "";
+    if (this.ptste.partystatus[charID].condition_pos > 0)
+      this.waitcharcondition.text += "/毒";
+    if (this.ptste.partystatus[charID].condition_pri > 0)
+      this.waitcharcondition.text += "/麻痺";
+    if (this.ptste.partystatus[charID].condition_sleeep > 0)
+      this.waitcharcondition.text += "/睡眠";
+    if (this.ptste.partystatus[charID].condition_brin > 0)
+      this.waitcharcondition.text += "/暗闇";
+    if (this.ptste.partystatus[charID].condition_charm > 0)
+      this.waitcharcondition.text += "/魅了";
+    if (this.ptste.partystatus[charID].condition_yakedo > 0)
+      this.waitcharcondition.text += "/火傷";
+    this.waitcharcondition.text += "\n";
+    if (charID == 0)
+    {
+      if (this.ptste.fillseal > 0)
+        this.waitcharcondition.text += "/フィールシール";
+      if (this.ptste.yellcount > 0)
+        this.waitcharcondition.text += "/エール";
+    }
+    if (charID == 1)
+    {
+      if (this.ptste.resight > 0)
+        this.waitcharcondition.text += "/リザイン";
+      if (this.ptste.Andead > 0)
+        this.waitcharcondition.text += "/アンデッド";
+    }
+    if (charID == 2 && this.ptste.ether > 0)
+    {
+      Text waitcharcondition = this.waitcharcondition;
+      waitcharcondition.text = waitcharcondition.text + "/エーテル x" + (object) this.ptste.ether;
+    }
+    if (charID == 3)
+    {
+      if ((double) this.ptste.suijin > 0.0)
+        this.waitcharcondition.text += "/水神の加護";
+      if (this.plyskill.mpkabau > 0)
+        this.waitcharcondition.text += "/MPかばう";
+    }
+    if (this.ptste.cut > 0)
+      this.waitcharcondition.text += "/カット";
+    if (this.ptste.mist > 0)
+      this.waitcharcondition.text += "/ミスト";
+    if (this.ptste.aura)
+      this.waitcharcondition.text += "/オーラ";
+    if (this.ptste.passion > 0)
+      this.waitcharcondition.text += "/パッション";
+    if (this.ptste.craun[charID])
+      this.waitcharcondition.text += "/クラウン";
+    if (this.ptste.crono > 0)
+      this.waitcharcondition.text += "/クロノ";
+    if (this.ptste.assasin[charID] > 0)
+      this.waitcharcondition.text += "/アサシン";
+    if (this.ptste.muteki[charID] > 0)
+      this.waitcharcondition.text += "/無敵";
+    if (this.ptste.suzuran[charID] > 0)
+      this.waitcharcondition.text += "/鈴蘭";
+    if (this.ptste.genkaku[charID])
+      this.waitcharcondition.text += "/幻覚";
+    if (this.ptste.zokusei_up > 0)
+      this.waitcharcondition.text += "/エレメントアップ";
+    if (this.plyskill.usemp_zero > 0)
+      this.waitcharcondition.text += "/ゼロエーテル";
+    if (this.plyskill.shell > 0)
+      this.waitcharcondition.text += "/シェル";
+    if (this.plyskill.materiabaria > 0)
+      this.waitcharcondition.text += "/魔バリア";
+    if (this.plyskill.magic_stance > 0)
+      this.waitcharcondition.text += "/マジックチャンク";
+    if (this.plyskill.dexupturn > 0)
+      this.waitcharcondition.text += "/ヘイスト";
+    if (this.plyskill.teikou <= 0)
+      return;
+    this.waitcharcondition.text += "/抵抗";
+  }
+}

@@ -1,0 +1,493 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class SkillMenu : MonoBehaviour
+{
+  public int[,,] Skilllean_bool = new int[4, 4, 19];
+  private Text[] SkillTrreebutton_name = new Text[19];
+  private GameObject[] SkilladdLiine = new GameObject[11];
+  private Image[] SkillTree_button = new Image[19];
+  public Color[] buttonconditioncolor = new Color[5];
+  private int waitime = 0;
+  private int selectbutton_pad = 0;
+  private int[] y = new int[4];
+  private int selectongskillbuttonID = 0;
+  private int charmode = 0;
+  public int actionID = 0;
+  public int[] setskill_atk = new int[4];
+  public int[] setskill_def = new int[4];
+  public int[] setskill_jam = new int[4];
+  public int[] setskill_enh = new int[4];
+  public string[] special = new string[4]
+  {
+    "ループ",
+    "花鳥風月",
+    "エレメンタルブラスト",
+    "エンプレスパートリーシュガー"
+  };
+  private MenuOpen menu;
+  private PartyStetus PTste;
+  [SerializeField]
+  private SkillLineListAsset[] SkillLineSet;
+  public GameObject Skillcomandbutton;
+  public Text nameplat;
+  public Text[] Skill_Setname;
+  public Button[] skillbutton;
+  public int[] skillpoint;
+  [SerializeField]
+  private GameObject SkillTreeparent;
+  public CharSkilldata[] charskilllist;
+  public Text skilldescroption;
+  public Text nameplate;
+  private int i;
+  private int z;
+  private string charname;
+  private bool skilllean_ok;
+
+  private void Start()
+  {
+    this.PTste = this.GetComponent<PartyStetus>();
+    this.menu = this.GetComponent<MenuOpen>();
+    for (this.i = 0; this.i < 19; ++this.i)
+    {
+      this.SkillTree_button[this.i] = GameObject.Find("Skill (" + (object) this.i + ")").GetComponent<Image>();
+      this.SkillTrreebutton_name[this.i] = GameObject.Find("Skill(" + (object) this.i + ")_text").GetComponent<Text>();
+    }
+    for (this.i = 0; this.i < 11; ++this.i)
+      this.SkilladdLiine[this.i] = GameObject.Find("baseSkillNode" + (object) this.i);
+    for (this.i = 0; this.i < 4; ++this.i)
+    {
+      this.skillpoint[this.i] = PlayerPrefs.GetInt("Skillpoint" + (object) this.i, 0);
+      for (int index = 0; index < 4; ++index)
+      {
+        for (this.z = 0; this.z < 19; ++this.z)
+          this.Skilllean_bool[this.i, index, this.z] = PlayerPrefs.GetInt("SkillLean_bool " + (object) this.i + "_" + (object) index + "_" + (object) this.z, 0);
+      }
+    }
+    for (this.i = 0; this.i < 4; ++this.i)
+    {
+      for (this.z = 0; this.z < 4; ++this.z)
+        this.Skilllean_bool[this.i, this.z, 0] = 1;
+    }
+  }
+
+  private void Update()
+  {
+    this.Key_();
+    if (this.menu.menuID == 4)
+    {
+      for (this.i = 0; this.i < 19; ++this.i)
+      {
+        if (this.Skilllean_bool[this.charmode, this.actionID, this.i] == 1)
+          this.SkillTree_button[this.i].color = this.buttonconditioncolor[1];
+      }
+    }
+    this.SkillTextSet();
+    this.SkillsGUI();
+    this.charname = this.PTste.partystatus[this.charmode].name;
+  }
+
+  public void Key_()
+  {
+    if (this.menu.menuID != 4)
+      return;
+    ++this.waitime;
+    if (this.waitime >= 20)
+    {
+      if (Input.GetButtonDown("Fire5") && this.charmode > 0)
+      {
+        this.waitime = 0;
+        --this.charmode;
+      }
+      else if (Input.GetButtonDown("Fire6") && this.charmode < 3)
+      {
+        this.waitime = 0;
+        ++this.charmode;
+      }
+      else if (Input.GetButtonDown("Fire7") && this.actionID > 0)
+      {
+        this.waitime = 0;
+        --this.actionID;
+        this.SkillMode(this.actionID);
+      }
+      else if (Input.GetButtonDown("Fire8") && this.actionID < 3)
+      {
+        this.waitime = 0;
+        ++this.actionID;
+        this.SkillMode(this.actionID);
+      }
+      this.charname = this.PTste.partystatus[this.charmode].name;
+      if ((double) Input.GetAxis("Vertical") > 0.0)
+      {
+        this.waitime = 0;
+        if (this.selectbutton_pad > 0)
+          --this.selectbutton_pad;
+        this.selectongskillbuttonID = this.selectbutton_pad;
+        this.SkillButtonIDSet(this.selectbutton_pad);
+      }
+      else if ((double) Input.GetAxis("Vertical") < 0.0)
+      {
+        this.waitime = 0;
+        if (this.selectbutton_pad < 18)
+          ++this.selectbutton_pad;
+        this.selectongskillbuttonID = this.selectbutton_pad;
+        this.SkillButtonIDSet(this.selectbutton_pad);
+      }
+      this.selectbutton_pad = Mathf.Clamp(this.selectbutton_pad, 0, 18);
+      if (Input.GetButtonDown("Fire3"))
+      {
+        if (this.Skilllean_bool[this.charmode, this.actionID, this.selectongskillbuttonID] == 1)
+        {
+          switch (this.actionID)
+          {
+            case 1:
+              this.setskill_atk[this.charmode] = this.y[this.charmode];
+              break;
+            case 2:
+              this.setskill_def[this.charmode] = this.y[this.charmode];
+              break;
+            case 3:
+              this.setskill_enh[this.charmode] = this.y[this.charmode];
+              break;
+            case 4:
+              this.setskill_jam[this.charmode] = this.y[this.charmode];
+              break;
+            default:
+              this.actionID = 1;
+              break;
+          }
+        }
+        else
+          this.Leanbutton();
+      }
+    }
+  }
+
+  public void SkillTextSet()
+  {
+    if (this.menu.charpartyflag[this.charmode])
+    {
+      if (this.actionID == 0)
+      {
+        for (this.i = 0; this.i < 19; ++this.i)
+          this.SkillTrreebutton_name[this.i].text = this.charskilllist[this.charmode].ATKSkillname[this.i];
+      }
+      if (this.actionID == 1)
+      {
+        for (this.i = 0; this.i < 19; ++this.i)
+          this.SkillTrreebutton_name[this.i].text = this.charskilllist[this.charmode].DEFSkillname[this.i];
+      }
+      if (this.actionID == 2)
+      {
+        for (this.i = 0; this.i < 19; ++this.i)
+          this.SkillTrreebutton_name[this.i].text = this.charskilllist[this.charmode].ENHSkillname[this.i];
+      }
+      if (this.actionID != 3)
+        return;
+      for (this.i = 0; this.i < 19; ++this.i)
+        this.SkillTrreebutton_name[this.i].text = this.charskilllist[this.charmode].JAMSkillname[this.i];
+    }
+    else
+    {
+      for (this.i = 0; this.i < 19; ++this.i)
+        this.SkillTrreebutton_name[this.i].text = "";
+    }
+  }
+
+  public void SkillsGUI()
+  {
+    if (this.menu.menuID != 4)
+      return;
+    if (this.menu.charpartyflag[this.charmode])
+    {
+      this.Skill_Setname[0].text = this.charskilllist[this.charmode].ATKSkillname[this.setskill_atk[this.charmode]];
+      this.Skill_Setname[1].text = this.charskilllist[this.charmode].DEFSkillname[this.setskill_def[this.charmode]];
+      this.Skill_Setname[2].text = this.charskilllist[this.charmode].ENHSkillname[this.setskill_enh[this.charmode]];
+      this.Skill_Setname[3].text = this.charskilllist[this.charmode].JAMSkillname[this.setskill_jam[this.charmode]];
+      this.nameplat.text = this.charname + "  所持スキルポイント:" + this.skillpoint[this.charmode].ToString() + " pt";
+    }
+    else
+    {
+      for (this.i = 0; this.i < 4; ++this.i)
+        this.Skill_Setname[this.i].text = "";
+      this.nameplat.text = "";
+    }
+  }
+
+  public void SkillButtonIDSet(int skillID)
+  {
+    this.selectongskillbuttonID = skillID;
+    if (this.Skilllean_bool[this.charmode, this.actionID, skillID] == 1)
+    {
+      if (skillID == 0 || skillID == 4 || skillID == 5)
+        skillID = 0;
+      if (skillID == 1 || skillID == 6 || skillID == 7)
+        skillID = 1;
+      if (skillID == 2 || skillID == 8 || skillID == 9)
+        skillID = 2;
+      if (skillID == 3 || skillID == 10 || skillID == 11)
+        skillID = 3;
+      if (skillID == 12 || skillID == 13)
+        skillID = 12;
+      if (skillID == 16 || skillID == 17)
+        skillID = 16;
+      if (this.actionID == 0)
+        this.setskill_atk[this.charmode] = skillID;
+      if (this.actionID == 1)
+        this.setskill_def[this.charmode] = skillID;
+      if (this.actionID == 2)
+        this.setskill_enh[this.charmode] = skillID;
+      if (this.actionID == 3)
+        this.setskill_jam[this.charmode] = skillID;
+      this.Skillcomandbutton.SetActive(false);
+    }
+    else
+      this.Skillcomandbutton.SetActive(true);
+    for (int index = 0; index < this.SkilladdLiine.Length; ++index)
+      this.SkilladdLiine[index].GetComponent<Image>().color = this.buttonconditioncolor[3];
+    for (int index = 0; index < 19; ++index)
+    {
+      if (index == skillID)
+        this.SkillTree_button[skillID].color = this.buttonconditioncolor[2];
+      else
+        this.SkillTree_button[index].color = this.buttonconditioncolor[0];
+    }
+    for (int index = 0; index < this.SkillLineSet[this.selectongskillbuttonID].ActiveLine.Length; ++index)
+    {
+      this.SkilladdLiine[this.SkillLineSet[this.selectongskillbuttonID].ActiveLine[index]].GetComponent<Image>().color = this.buttonconditioncolor[4];
+      this.SkilladdLiine[this.SkillLineSet[this.selectongskillbuttonID].ActiveLine[index]].GetComponentInChildren<Image>().color = this.buttonconditioncolor[4];
+    }
+    if (this.actionID == 0)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, skillID] == 1)
+        this.Skill_Setname[this.actionID].text = this.charskilllist[this.charmode].ATKSkillname[skillID];
+      this.skilldescroption.text = this.charskilllist[this.charmode].ATKSkillname[this.selectongskillbuttonID] + "\n" + this.charskilllist[this.charmode].ATKSkilldiscrip[skillID] + "消費MP:" + (object) this.charskilllist[this.charmode].ATKSkillMP[skillID] + "\n習得スキルポイント: " + (object) this.charskilllist[this.charmode].ATKSkillneept[skillID] + " pt";
+    }
+    if (this.actionID == 1)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, skillID] == 1)
+        this.Skill_Setname[this.actionID].text = this.charskilllist[this.charmode].DEFSkillname[skillID];
+      this.skilldescroption.text = this.charskilllist[this.charmode].DEFSkillname[this.selectongskillbuttonID] + "\n" + this.charskilllist[this.charmode].DEFSkilldiscrip[skillID] + "消費MP:" + (object) this.charskilllist[this.charmode].DEFSkillMP[skillID] + "\n習得スキルポイント: " + (object) this.charskilllist[this.charmode].DEFSkillneept[skillID] + " pt";
+    }
+    if (this.actionID == 2)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, skillID] == 1)
+        this.Skill_Setname[this.actionID].text = this.charskilllist[this.charmode].ENHSkillname[skillID];
+      this.skilldescroption.text = this.charskilllist[this.charmode].ENHSkillname[this.selectongskillbuttonID] + "\n" + this.charskilllist[this.charmode].ENHSkilldiscrip[skillID] + "消費MP:" + (object) this.charskilllist[this.charmode].ENHSkillMP[skillID] + "\n習得スキルポイント: " + (object) this.charskilllist[this.charmode].ENHSkillneept[skillID] + " pt";
+    }
+    if (this.actionID != 3)
+      return;
+    if (this.Skilllean_bool[this.charmode, this.actionID, skillID] == 1)
+      this.Skill_Setname[this.actionID].text = this.charskilllist[this.charmode].JAMSkillname[skillID];
+    this.skilldescroption.text = this.charskilllist[this.charmode].JAMSkillname[this.selectongskillbuttonID] + "\n" + this.charskilllist[this.charmode].JAMSkilldiscrip[skillID] + "消費MP:" + (object) this.charskilllist[this.charmode].JAMSkillMP[skillID] + "\n習得スキルポイント: " + (object) this.charskilllist[this.charmode].JAMSkillneept[skillID] + " pt";
+  }
+
+  public void Leanbutton()
+  {
+    if (this.Skilllean_bool[this.charmode, this.actionID, this.selectongskillbuttonID] == 1)
+      return;
+    if (this.selectongskillbuttonID >= 0 && this.selectongskillbuttonID <= 3)
+      this.skilllean_ok = true;
+    else if (this.selectongskillbuttonID == 4)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, 0] == 0)
+      {
+        this.skilldescroption.text = "条件を満たしていないため習得できません";
+        this.skilllean_ok = false;
+      }
+      else
+        this.skilllean_ok = true;
+    }
+    else if (this.selectongskillbuttonID == 5)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, 4] == 0)
+      {
+        this.skilldescroption.text = "条件を満たしていないため習得できません";
+        this.skilllean_ok = false;
+      }
+      else
+        this.skilllean_ok = true;
+    }
+    if (this.selectongskillbuttonID == 6)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, 1] == 0)
+      {
+        this.skilldescroption.text = "条件を満たしていないため習得できません";
+        this.skilllean_ok = false;
+      }
+      else
+        this.skilllean_ok = true;
+    }
+    else if (this.selectongskillbuttonID == 7)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, 6] == 0)
+      {
+        this.skilldescroption.text = "条件を満たしていないため習得できません";
+        this.skilllean_ok = false;
+      }
+      else
+        this.skilllean_ok = true;
+    }
+    if (this.selectongskillbuttonID == 8)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, 2] == 0)
+      {
+        this.skilldescroption.text = "条件を満たしていないため習得できません";
+        this.skilllean_ok = false;
+      }
+      else
+        this.skilllean_ok = true;
+    }
+    else if (this.selectongskillbuttonID == 9)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, 8] == 0)
+      {
+        this.skilldescroption.text = "条件を満たしていないため習得できません";
+        this.skilllean_ok = false;
+      }
+      else
+        this.skilllean_ok = true;
+    }
+    if (this.selectongskillbuttonID == 10)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, 3] == 0)
+      {
+        this.skilldescroption.text = "条件を満たしていないため習得できません";
+        this.skilllean_ok = false;
+      }
+      else
+        this.skilllean_ok = true;
+    }
+    else if (this.selectongskillbuttonID == 11)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, 10] == 0)
+      {
+        this.skilldescroption.text = "条件を満たしていないため習得できません";
+        this.skilllean_ok = false;
+      }
+      else
+        this.skilllean_ok = true;
+    }
+    else if (this.selectongskillbuttonID == 12)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, 0] == 0 || this.Skilllean_bool[this.charmode, this.actionID, 1] == 0)
+      {
+        this.skilldescroption.text = "条件を満たしていないため習得できません";
+        this.skilllean_ok = false;
+      }
+      else
+        this.skilllean_ok = true;
+    }
+    else if (this.selectongskillbuttonID == 13)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, 12] == 0)
+      {
+        this.skilldescroption.text = "条件を満たしていないため習得できません";
+        this.skilllean_ok = false;
+      }
+      else
+        this.skilllean_ok = true;
+    }
+    else if (this.selectongskillbuttonID == 14)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, 13] == 0 || this.Skilllean_bool[this.charmode, this.actionID, 16] == 0)
+      {
+        this.skilldescroption.text = "条件を満たしていないため習得できません";
+        this.skilllean_ok = false;
+      }
+      else
+        this.skilllean_ok = true;
+    }
+    else if (this.selectongskillbuttonID == 15)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, 1] == 0 || this.Skilllean_bool[this.charmode, this.actionID, 2] == 0)
+      {
+        this.skilldescroption.text = "条件を満たしていないため習得できません";
+        this.skilllean_ok = false;
+      }
+      else
+        this.skilllean_ok = true;
+    }
+    else if (this.selectongskillbuttonID == 16)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, 15] == 0 || this.Skilllean_bool[this.charmode, this.actionID, 18] == 0)
+      {
+        this.skilldescroption.text = "条件を満たしていないため習得できません";
+        this.skilllean_ok = false;
+      }
+      else
+        this.skilllean_ok = true;
+    }
+    else if (this.selectongskillbuttonID == 17)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, 16] == 0)
+      {
+        this.skilldescroption.text = "条件を満たしていないため習得できません";
+        this.skilllean_ok = false;
+      }
+      else
+        this.skilllean_ok = true;
+    }
+    else if (this.selectongskillbuttonID == 18)
+    {
+      if (this.Skilllean_bool[this.charmode, this.actionID, 2] == 0 || this.Skilllean_bool[this.charmode, this.actionID, 3] == 0)
+      {
+        this.skilldescroption.text = "条件を満たしていないため習得できません";
+        this.skilllean_ok = false;
+      }
+      else
+        this.skilllean_ok = true;
+    }
+    if (this.skilllean_ok)
+    {
+      switch (this.actionID)
+      {
+        case 0:
+          if (this.skillpoint[this.charmode] >= this.charskilllist[this.charmode].ATKSkillneept[this.selectongskillbuttonID])
+          {
+            this.skilldescroption.text = "スキル:" + this.charskilllist[this.charmode].ATKSkillname[this.selectongskillbuttonID] + "を習得しました";
+            this.skillpoint[this.charmode] -= this.charskilllist[this.charmode].ATKSkillneept[this.selectongskillbuttonID];
+            this.Skilllean_bool[this.charmode, this.actionID, this.selectongskillbuttonID] = 1;
+            break;
+          }
+          this.skilldescroption.text = "条件を満たしていないため習得できません";
+          break;
+        case 1:
+          if (this.skillpoint[this.charmode] >= this.charskilllist[this.charmode].DEFSkillneept[this.selectongskillbuttonID])
+          {
+            this.Skilllean_bool[this.charmode, this.actionID, this.selectongskillbuttonID] = 1;
+            this.skilldescroption.text = "スキル:" + this.charskilllist[this.charmode].DEFSkillname[this.selectongskillbuttonID] + "を習得しました";
+            this.skillpoint[this.charmode] -= this.charskilllist[this.charmode].DEFSkillneept[this.selectongskillbuttonID];
+            break;
+          }
+          this.skilldescroption.text = "条件を満たしていないため習得できません";
+          break;
+        case 2:
+          if (this.skillpoint[this.charmode] >= this.charskilllist[this.charmode].ENHSkillneept[this.selectongskillbuttonID])
+          {
+            this.skilldescroption.text = "スキル:" + this.charskilllist[this.charmode].ENHSkillname[this.selectongskillbuttonID] + "を習得しました";
+            this.skillpoint[this.charmode] -= this.charskilllist[this.charmode].ENHSkillneept[this.selectongskillbuttonID];
+            this.Skilllean_bool[this.charmode, this.actionID, this.selectongskillbuttonID] = 1;
+            break;
+          }
+          this.skilldescroption.text = "条件を満たしていないため習得できません";
+          break;
+        case 3:
+          if (this.skillpoint[this.charmode] >= this.charskilllist[this.charmode].JAMSkillneept[this.selectongskillbuttonID])
+          {
+            this.skilldescroption.text = "スキル:" + this.charskilllist[this.charmode].JAMSkillname[this.selectongskillbuttonID] + "を習得しました";
+            this.skillpoint[this.charmode] -= this.charskilllist[this.charmode].JAMSkillneept[this.selectongskillbuttonID];
+            this.Skilllean_bool[this.charmode, this.actionID, this.selectongskillbuttonID] = 1;
+            break;
+          }
+          this.skilldescroption.text = "条件を満たしていないため習得できません";
+          break;
+      }
+    }
+  }
+
+  public void SkillMode(int mode_)
+  {
+    this.actionID = mode_;
+  }
+}

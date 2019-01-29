@@ -1,0 +1,20 @@
+using UnityEngine;
+
+public class EnemySkills : MonoBehaviour
+{
+  private EnemyStetus enemustetus;
+  public int enemyNo;
+  private BattleturnManager battlemanager;
+
+  private void Start()
+  {
+    this.battlemanager = GameObject.Find("BattleManager").GetComponent<BattleturnManager>();
+  }
+
+  private void OnGUI()
+  {
+    if (this.battlemanager.enemyCopy_[this.enemyNo].HP > 0)
+      return;
+    Object.Destroy((Object) this.gameObject, 0.5f);
+  }
+}

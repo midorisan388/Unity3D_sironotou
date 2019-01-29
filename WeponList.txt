@@ -1,0 +1,140 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class WeponMenu : MonoBehaviour
+{
+  public int[] setID = new int[4];
+  public int selectID = 2;
+  private int waitime = 0;
+  private int select_mode = 0;
+  public string[] partymember = new string[4]
+  {
+    "",
+    "",
+    "",
+    ""
+  };
+  private int i;
+  private int j;
+  public Text[] stetasname;
+  public int[] nowID;
+  public string[] setweponame;
+  public int selectchar;
+  private MenuOpen menuopen;
+  private PartyStetus PTste;
+  private WeponList weponlis;
+  public Text[] ItemListText;
+
+  private void Start()
+  {
+    this.menuopen = GameObject.Find("GameManager").GetComponent<MenuOpen>();
+    this.PTste = GameObject.Find("GameManager").GetComponent<PartyStetus>();
+    this.weponlis = GameObject.Find("GameManager").GetComponent<WeponList>();
+    this.setweponame[0] = this.weponlis.nih_name[this.setID[0]];
+  }
+
+  public void Update()
+  {
+    if (this.menuopen.menuID == 3)
+    {
+      if (this.select_mode == 0)
+      {
+        ++this.waitime;
+        if (this.waitime >= 20)
+        {
+          if (Input.GetButtonDown("Fire5") && this.selectchar > 0)
+          {
+            this.waitime = 0;
+            --this.selectchar;
+            this.ItemListText[1].text = this.weponlis.acsename[this.setID[this.selectchar]];
+          }
+          if (Input.GetButtonDown("Fire6") && this.selectchar < 3)
+          {
+            this.waitime = 0;
+            ++this.selectchar;
+            this.ItemListText[1].text = this.weponlis.acsename[this.setID[this.selectchar]];
+          }
+        }
+      }
+      ++this.waitime;
+      if (this.waitime >= 50)
+      {
+        if ((double) Input.GetAxis("Vertical") > 0.0 && this.selectID > 0)
+        {
+          this.waitime = 0;
+          --this.selectID;
+        }
+        if ((double) Input.GetAxis("Vertical") < 0.0 && this.selectID < 43)
+        {
+          this.waitime = 0;
+          ++this.selectID;
+        }
+        if (Input.GetButtonDown("Fire3"))
+        {
+          this.waitime = 0;
+          if (this.weponlis.acsehave[this.selectID] > 0)
+            this.setID[this.selectchar] = this.selectID;
+        }
+      }
+      for (this.i = 0; this.i < 6; ++this.i)
+        this.ItemListText[this.i].text = this.selectID + this.i < 0 || this.weponlis.acsehave[this.selectID + this.i] <= 0 ? "ñ¢èäéù" : this.weponlis.acsename[this.selectID + this.i];
+      this.AcsSet(this.selectID);
+    }
+    else
+    {
+      this.waitime = 0;
+      this.select_mode = 0;
+      this.selectID = 0;
+    }
+  }
+
+  public void AcsSet(int no)
+  {
+    if (this.menuopen.menuID != 3)
+      return;
+    if (this.weponlis.acsehave[no] > 0)
+    {
+      if (this.menuopen.charpartyflag[this.selectchar])
+      {
+        this.stetasname[0].text = this.PTste.partystatus[this.selectchar].name;
+        this.stetasname[1].text = "Level " + (object) this.PTste.partystatus[this.selectchar].level;
+        this.stetasname[2].text = "maxHP  " + (object) this.PTste.partystatus[this.selectchar].maxHP + "  +" + (object) this.weponlis.acs_upHP[no];
+        this.stetasname[3].text = "maxMP  " + (object) this.PTste.partystatus[this.selectchar].maxMP + "  +" + (object) this.weponlis.acs_upMP[no];
+        this.stetasname[4].text = "çUåÇóÕ  " + (object) this.PTste.partystatus[this.selectchar].power + "  +" + (object) this.weponlis.acs_upower[no];
+        this.stetasname[5].text = "ñhå‰óÕ  " + (object) this.PTste.partystatus[this.selectchar].deff + "  +" + (object) this.weponlis.acs_updeff[no];
+        this.stetasname[6].text = "ê∏ê_óÕ  " + (object) this.PTste.partystatus[this.selectchar].INT + "  +" + (object) this.weponlis.acs_upINT[no];
+        this.stetasname[7].text = "ïqè∑ìx  " + this.PTste.partystatus[this.selectchar].dex.ToString("f1") + "  +" + this.weponlis.acs_updex[no].ToString("f1");
+      }
+      else
+      {
+        this.stetasname[0].text = "Nodata";
+        this.stetasname[1].text = "";
+        this.stetasname[2].text = "maxHP  ";
+        this.stetasname[3].text = "maxMP  ";
+        this.stetasname[4].text = "çUåÇóÕ  ";
+        this.stetasname[5].text = "ñhå‰óÕ  ";
+        this.stetasname[6].text = "ê∏ê_óÕ  ";
+        this.stetasname[7].text = "ïqè∑ìx  ";
+      }
+    }
+    else
+    {
+      if (this.menuopen.charpartyflag[this.selectchar])
+      {
+        this.stetasname[0].text = this.PTste.partystatus[this.selectchar].name;
+        this.stetasname[1].text = "Level " + (object) this.PTste.partystatus[this.selectchar].level;
+      }
+      else
+      {
+        this.stetasname[0].text = "Nodata";
+        this.stetasname[1].text = "";
+      }
+      this.stetasname[2].text = "maxHP  ";
+      this.stetasname[3].text = "maxMP  ";
+      this.stetasname[4].text = "çUåÇóÕ  ";
+      this.stetasname[5].text = "ñhå‰óÕ  ";
+      this.stetasname[6].text = "ê∏ê_óÕ  ";
+      this.stetasname[7].text = "ïqè∑ìx  ";
+    }
+  }
+}

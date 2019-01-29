@@ -1,0 +1,21 @@
+using UnityEngine;
+
+public class PlayerCtrl : MonoBehaviour
+{
+  public GameObject ChildModel;
+  private GameObject gamemna;
+  private MenuOpen menu;
+
+  private void Start()
+  {
+    this.gamemna = GameObject.Find("GameManager");
+    this.menu = this.gamemna.GetComponent<MenuOpen>();
+  }
+
+  private void Update()
+  {
+    if (!this.menu.talkflag)
+      return;
+    this.ChildModel.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
+  }
+}

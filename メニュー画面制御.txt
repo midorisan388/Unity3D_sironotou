@@ -1,0 +1,298 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class MenuOpen : MonoBehaviour
+{
+  public static bool battleflag = false;
+  private int waitime = 0;
+  public int charselect_x = 0;
+  public bool warpflag_ = false;
+  private int sel_y = 50;
+  public int menuID = 0;
+  public bool talkflag = false;
+  public bool[] charpartyflag = new bool[4]
+  {
+    true,
+    true,
+    true,
+    true
+  };
+  private string[] partymember = new string[4]
+  {
+    "Nodata",
+    "Nodata",
+    "Nodata",
+    "Nodata"
+  };
+  private string porposetext = "";
+  private GameObject Player;
+  private PalamateMenu palamenu;
+  public Text menuanaunce;
+  public Text[] mainstetau;
+  public GameObject[] Menupanel;
+  public GameObject[] charbutton;
+  public Vector3 areawarp;
+  public Sprite[] partytext;
+  public Texture menuimage;
+  public Text nowmoney;
+  private int i;
+  private int j;
+  public int money;
+  public int story;
+  public bool Bossbatlle;
+  public static float x;
+  public static float y;
+  public static float z;
+  public bool battle;
+  public int posx;
+  public int posy;
+  public int posz;
+  public int returnscene;
+  public int battleID;
+  public int selectmode;
+  public Text porpose;
+  private int storypart;
+  private int time;
+  public bool[] itemflag;
+  private WeponMenu weponmenu;
+  private ItemList itemlist;
+  private SkillMenu skillmenu;
+  private PartyStetus PTste;
+  private WeponMenu wepon;
+
+  private void Awake()
+  {
+    Object.DontDestroyOnLoad((Object) this.gameObject);
+  }
+
+  private void Start()
+  {
+    this.Player = GameObject.Find("Player");
+    this.weponmenu = this.GetComponent<WeponMenu>();
+    this.itemlist = this.GetComponent<ItemList>();
+    this.skillmenu = this.GetComponent<SkillMenu>();
+    this.PTste = this.GetComponent<PartyStetus>();
+    this.wepon = this.GetComponent<WeponMenu>();
+    this.palamenu = this.GetComponent<PalamateMenu>();
+    this.selectmode = 2;
+    this.talkflag = false;
+    MenuOpen.battleflag = false;
+  }
+
+  public void PartySet()
+  {
+    for (this.i = 0; this.i < 4; ++this.i)
+    {
+      if (this.charpartyflag[this.i])
+      {
+        this.partymember[this.i] = this.PTste.partystatus[this.i].name + " \nレベル" + (object) this.PTste.partystatus[this.i].level + "\nHP " + (object) this.PTste.partystatus[this.i].HP + "/" + (object) this.PTste.partystatus[this.i].maxHP + "\n MP " + (object) this.PTste.partystatus[this.i].MP + "/" + (object) this.PTste.partystatus[this.i].maxMP;
+        this.charbutton[this.i].SetActive(true);
+      }
+      else
+      {
+        this.partymember[this.i] = "Nodeta";
+        this.charbutton[this.i].SetActive(false);
+      }
+      this.mainstetau[this.i].text = this.partymember[this.i];
+    }
+  }
+
+  public void Update()
+  {
+    if (this.menuID != -2 && this.menuID != -1 && (!this.talkflag && !MenuOpen.battleflag))
+      ++this.time;
+    this.money = Mathf.Clamp(this.money, 0, 9999999);
+    this.PartySet();
+    this.KeyCntl();
+    this.StoryText();
+    this.nowmoney.text = "所持金  " + (object) this.money + "  ";
+    if (this.talkflag)
+      return;
+    for (this.i = 0; this.i < 4; ++this.i)
+    {
+      if (this.charpartyflag[this.i])
+        this.charbutton[this.i].SetActive(true);
+    }
+    if (!this.battle)
+    {
+      if (Input.GetKeyDown(KeyCode.F1))
+        this.menuID = 2;
+      if (Input.GetKeyDown(KeyCode.F2))
+        this.menuID = 3;
+      if (Input.GetKeyDown(KeyCode.F3))
+        this.menuID = 4;
+      if (Input.GetKeyDown(KeyCode.F4))
+        this.menuID = 5;
+      if (Input.GetKeyDown(KeyCode.F5))
+        this.menuID = 6;
+      if (Input.GetKeyDown(KeyCode.F6))
+        this.menuID = 7;
+      if (this.selectmode == 2)
+        this.menuanaunce.text = "アイテムメニューを開きます";
+      if (this.selectmode == 3)
+        this.menuanaunce.text = "装備メニューを開きます";
+      if (this.selectmode == 4)
+        this.menuanaunce.text = "スキルメニューを開きます";
+      if (this.selectmode == 5)
+        this.menuanaunce.text = "クエストメニューを開きます";
+      if (this.selectmode == 6)
+        this.menuanaunce.text = "ステータスメニューを開きます";
+      if (this.selectmode == 7)
+        this.menuanaunce.text = "システムメニューを開きます";
+      if (this.time >= 20)
+      {
+        if (Input.GetButtonDown("Fire4"))
+        {
+          this.time = 0;
+          if (this.menuID == 0)
+            this.PanelSet(1);
+        }
+        else if (Input.GetButtonDown("Fire2") || Input.GetButtonDown("Fire4"))
+        {
+          this.time = 0;
+          if (this.menuID == 1)
+            this.menuID = 0;
+          else if (this.menuID > 1)
+            this.menuID = 1;
+        }
+      }
+    }
+    this.PanelSetAct();
+    if (this.battle && this.menuID == 2)
+    {
+      this.waitime = 0;
+      if (Input.GetButtonDown("Fire2"))
+        this.menuID = -2;
+    }
+  }
+
+  public void KeyCntl()
+  {
+    if (this.menuID != 1 || this.time < 20)
+      return;
+    if ((double) Input.GetAxis("Vertical") > 0.0)
+    {
+      if (this.selectmode > 2)
+        --this.selectmode;
+      this.time = 0;
+    }
+    else if ((double) Input.GetAxis("Vertical") < 0.0)
+    {
+      if (this.selectmode < 7)
+        ++this.selectmode;
+      this.time = 0;
+    }
+    this.selectmode = Mathf.Clamp(this.selectmode, 2, 7);
+    if (this.selectmode == 2)
+      this.menuanaunce.text = "アイテムメニューを開きます";
+    if (this.selectmode == 3)
+      this.menuanaunce.text = "装備メニューを開きます";
+    if (this.selectmode == 4)
+      this.menuanaunce.text = "スキルメニューを開きます";
+    if (this.selectmode == 5)
+      this.menuanaunce.text = "クエストメニューを開きます";
+    if (this.selectmode == 6)
+      this.menuanaunce.text = "ステータスメニューを開きます";
+    if (this.selectmode == 7)
+      this.menuanaunce.text = "システムメニューを開きます";
+    if (Input.GetButtonDown("Fire3"))
+    {
+      this.time = 0;
+      this.menuID = this.selectmode;
+    }
+  }
+
+  public void StoryText()
+  {
+    if (this.story < 15)
+      this.storypart = 1;
+    else if (this.storypart < 25)
+      this.storypart = 2;
+    else if (this.story < 40)
+      this.storypart = 3;
+    if (this.story == 1)
+      this.porposetext = "部屋を出る";
+    if (this.story == 5)
+      this.porposetext = "墓守の畔へ行く";
+    if (this.story == 6)
+      this.porposetext = "キキョウを探す";
+    if (this.story == 8)
+      this.porposetext = "シヴァにキキョウを届ける";
+    if (this.story == 9)
+      this.porposetext = "村長の家へ行く";
+    if (this.story == 11)
+      this.porposetext = "イヴァンの家へ戻る";
+    if (this.story == 13)
+      this.porposetext = "ウェル村の広場へ出る";
+    if (this.story == 15)
+      this.porposetext = "森神を探す";
+    if (this.story == 17)
+      this.porposetext = "謎の入り口へ入る";
+    if (this.story == 19)
+      this.porposetext = "もう一度森神を探す";
+    if (this.story == 25)
+      this.porposetext = "白い道を進む";
+    if (this.story == 27)
+      this.porposetext = "里の泉へ向かう";
+    if (this.story == 29)
+      this.porposetext = "港町へ向かう";
+    if (this.story == 31)
+      this.porposetext = "酒場で情報を集める";
+    if (this.story == 33)
+      this.porposetext = "アフネス船長に会いに行く";
+    if (this.story == 35)
+      this.porposetext = "宿屋にいる傭兵から乗船券を貰う";
+    if (this.story == 37)
+      this.porposetext = "水神の社へ行く";
+    if (this.story == 39)
+      this.porposetext = "アフネス船長の船に乗る";
+    this.porpose.text = " 第 " + this.storypart.ToString() + "章 : " + this.porposetext;
+  }
+
+  private void PanelSetAct()
+  {
+    if (this.menuID == 1)
+      this.Menupanel[0].SetActive(true);
+    else
+      this.Menupanel[0].SetActive(false);
+    if (this.menuID == 2)
+      this.Menupanel[1].SetActive(true);
+    else
+      this.Menupanel[1].SetActive(false);
+    if (this.menuID == 3)
+      this.Menupanel[2].SetActive(true);
+    else
+      this.Menupanel[2].SetActive(false);
+    if (this.menuID == 4)
+      this.Menupanel[3].SetActive(true);
+    else
+      this.Menupanel[3].SetActive(false);
+    if (this.menuID == 5)
+      this.Menupanel[4].SetActive(true);
+    else
+      this.Menupanel[4].SetActive(false);
+    if (this.menuID == 6)
+      this.Menupanel[5].SetActive(true);
+    else
+      this.Menupanel[5].SetActive(false);
+    if (this.menuID == 7)
+      this.Menupanel[6].SetActive(true);
+    else
+      this.Menupanel[6].SetActive(false);
+  }
+
+  public void PanelSet(int no)
+  {
+    if (this.talkflag)
+      return;
+    this.itemlist.ItemSet();
+    this.weponmenu.AcsSet(0);
+    this.menuID = no;
+  }
+
+  public void PalamaterSet(int member)
+  {
+    this.charselect_x = member;
+    this.menuID = 6;
+  }
+}

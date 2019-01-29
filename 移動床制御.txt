@@ -1,0 +1,23 @@
+using UnityEngine;
+
+public class MoveFloor : MonoBehaviour
+{
+  private float _xprevious = 0.0f;
+  public GameObject _target = (GameObject) null;
+
+  private void OnTriggerEnter(Collider other)
+  {
+    if (!(other.tag == "MoveStage"))
+      return;
+    this._target = other.gameObject;
+    this.transform.parent = this._target.gameObject.transform;
+  }
+
+  private void OnTriggerExit(Collider other)
+  {
+    if (!(other.tag == "MoveStage"))
+      return;
+    this.transform.parent = (Transform) null;
+    this._target = (GameObject) null;
+  }
+}

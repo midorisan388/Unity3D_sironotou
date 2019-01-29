@@ -1,0 +1,96 @@
+using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.UI;
+
+public class StoryClass : MonoBehaviour
+{
+  private Color[] feedalfa = new Color[2];
+  public int StoryID = 0;
+  public int current = 0;
+  private double time = 0.0;
+  public bool eventend = false;
+  private MenuOpen menu;
+  public GameObject[] NPCObject;
+  public PlayableDirector director;
+  public Text talktext;
+  public Image feedout;
+  public GameObject talkwindow;
+  public GameObject Player;
+  public TextAsset scinariofile;
+  public GameObject EventCam;
+  public GameObject maincam;
+  private string scinariotext;
+  public string[] storytext;
+
+  public void Start_base()
+  {
+    this.menu = GameObject.Find("GameManager").GetComponent<MenuOpen>();
+    this.feedalfa[0].r = this.feedalfa[0].g = this.feedalfa[0].b = this.feedalfa[0].a = 0.0f;
+    this.feedalfa[1] = this.feedalfa[0];
+    this.feedalfa[1].a = 1f;
+    this.scinariotext = this.scinariofile.text;
+    this.storytext = this.scinariotext.Split('p');
+  }
+
+  public void OnTriggerEnter_base(Collider other)
+  {
+    if (!(other.tag == "Player") || this.menu.story != this.StoryID)
+      return;
+    this.feedout.color = this.feedalfa[1];
+    this.talkwindow.SetActive(true);
+    this.EventCam.SetActive(true);
+    this.maincam.SetActive(false);
+    this.Player.SetActive(false);
+    for (int index = 0; index < this.NPCObject.Length; ++index)
+      this.NPCObject[index].SetActive(true);
+    this.menu.talkflag = true;
+    this.director.Play();
+    ++this.menu.story;
+    this.feedout.color = this.feedalfa[0];
+  }
+
+  public void Update_base()
+  {
+    if (this.menu.story != this.StoryID + 1)
+      return;
+    this.time = this.eventend ? 5.0 : this.director.time - (double) (this.current * 5);
+    if (this.time >= 5.0 || this.eventend)
+    {
+      if (this.current == this.storytext.Length)
+      {
+        this.eventend = true;
+        this.EndEvent();
+      }
+      else
+        this.TextUpdate();
+    }
+    if (Input.GetButtonDown("Fire1"))
+    {
+      this.eventend = true;
+      this.current = this.storytext.Length;
+    }
+  }
+
+  public void EndEvent()
+  {
+    this.feedout.color = this.feedalfa[1];
+    this.maincam.SetActive(true);
+    this.director.Stop();
+    this.EventCam.SetActive(false);
+    for (int index = 0; index < this.NPCObject.Length; ++index)
+      this.NPCObject[index].SetActive(false);
+    this.Player.SetActive(true);
+    this.menu.talkflag = false;
+    this.talkwindow.SetActive(false);
+    ++this.menu.story;
+    this.feedout.color = this.feedalfa[0];
+  }
+
+  private void TextUpdate()
+  {
+    this.time = 0.0;
+    if (this.current < this.storytext.Length)
+      this.talktext.text = this.storytext[this.current];
+    ++this.current;
+  }
+}

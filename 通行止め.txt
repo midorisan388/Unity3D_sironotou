@@ -1,0 +1,21 @@
+using UnityEngine;
+
+public class Tukoudome : MonoBehaviour
+{
+  public GameObject target;
+  public int n;
+  public int after;
+  private MenuOpen menu;
+
+  private void Start()
+  {
+    this.menu = GameObject.Find("GameManager").GetComponent<MenuOpen>();
+  }
+
+  private void Update()
+  {
+    if (this.menu.story < this.n)
+      return;
+    Object.Destroy((Object) this.target);
+  }
+}

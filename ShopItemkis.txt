@@ -1,0 +1,9 @@
+using UnityEngine;
+
+[CreateAssetMenu]
+public class ShopItemList : ScriptableObject
+{
+  public int[] itemID_con;
+  public int[] itemID_mate;
+  public int[] itemID_acs;
+}

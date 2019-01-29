@@ -1,0 +1,408 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class Enemyrturn_skilleffect : MonoBehaviour
+{
+  private Animator[] partyanim = new Animator[4];
+  private BattleturnManager batlemana;
+  private PartyStetus PTste;
+  private Playerturn_skilleffect PTskill;
+  private ConditionController conditionparticle;
+  private GameObject manager;
+  private EnemyStetus enemuste;
+  private MenuOpen menu;
+  public EnemyStetus.enemySt enemyste;
+  public Text Info;
+  public GameObject[] Partys;
+  private int j;
+  private bool motionpara;
+  private int target;
+  private int damage;
+  private int condition_up;
+  private int memberturget;
+
+  private void Start()
+  {
+    for (this.j = 0; this.j < 4; ++this.j)
+      this.partyanim[this.j] = this.Partys[this.j].GetComponent<Animator>();
+    this.batlemana = this.GetComponent<BattleturnManager>();
+    this.menu = GameObject.Find("GameManager").GetComponent<MenuOpen>();
+    this.PTste = GameObject.Find("GameManager").GetComponent<PartyStetus>();
+    this.conditionparticle = this.batlemana.GetComponent<ConditionController>();
+    this.PTskill = this.GetComponent<Playerturn_skilleffect>();
+  }
+
+  public void Targetdamage(EnemyStetus.enemySt enemste, int skill_ID, int No)
+  {
+    switch (skill_ID)
+    {
+      case 0:
+        this.GoblinAtk();
+        this.damage = enemste.power;
+        this.BaffDamageCut();
+        this.ConditionReset();
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = this.PTste.partystatus[this.memberturget].name + "は" + (object) this.damage + "のダメージを受けた";
+        break;
+      case 1:
+        this.GoblinAtk();
+        this.damage = enemste.power - this.PTste.partystatus[this.memberturget].deff / 4;
+        this.BaffDamageCut();
+        this.ConditionReset();
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = enemste.name + "の毒爪攻撃\n" + this.PTste.partystatus[this.memberturget].name + "は" + (object) this.damage + "のダメージを受けた";
+        this.condition_up = Random.Range(0, 100);
+        if (this.PTste.partystatus[this.memberturget].poison_ <= 50 + this.condition_up)
+        {
+          if (!this.conditionparticle.offpoison[this.memberturget])
+          {
+            if (this.memberturget == 0 && !this.conditionparticle.charbuffoff[0])
+              this.conditionparticle.ConditionparticleSet(5, 0);
+            this.conditionparticle.ConditionparticleSet(0, this.memberturget);
+          }
+          this.PTste.partystatus[this.memberturget].condition_pos += 300;
+          Text info = this.Info;
+          info.text = info.text + this.PTste.partystatus[this.memberturget].name + "\nは毒になった";
+        }
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        this.batlemana.ptmotion[this.memberturget].SetFloat("damage", 1f);
+        break;
+      case 2:
+        this.GoblinAtk();
+        this.damage = enemste.power * 3 - this.PTste.partystatus[this.memberturget].deff;
+        this.BaffDamageCut();
+        this.ConditionReset();
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        this.batlemana.ptmotion[this.memberturget].SetFloat("damage", 1f);
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = enemste.name + "の強攻撃\n" + this.PTste.partystatus[this.memberturget].name + "は" + (object) this.damage + "のダメージを受けた";
+        this.batlemana.enemyCopy_[No].pri_ = 3;
+        break;
+      case 3:
+        this.GoblinAtk();
+        this.damage = enemste.power / 5;
+        this.BaffDamageCut();
+        this.ConditionReset();
+        this.batlemana.enemyCopy_[No].HP += this.damage;
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        this.batlemana.ptmotion[this.memberturget].SetFloat("damage", 1f);
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = enemste.name + "の吸血\n" + this.PTste.partystatus[this.memberturget].name + "は" + (object) this.damage + "のダメージを受けた";
+        break;
+      case 4:
+        this.GoblinAtk();
+        this.damage = enemste.power - this.PTste.partystatus[this.memberturget].deff / 4;
+        this.BaffDamageCut();
+        this.ConditionReset();
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        this.batlemana.ptmotion[this.memberturget].SetFloat("damage", 1f);
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = enemste.name + "の毒針攻撃\n" + this.PTste.partystatus[this.memberturget].name + "は" + (object) this.damage + "のダメージを受けた";
+        this.condition_up = Random.Range(0, 10);
+        if (this.PTste.partystatus[this.memberturget].poison_ <= 50 + this.condition_up)
+        {
+          if (!this.conditionparticle.offpoison[this.memberturget])
+          {
+            if (this.memberturget == 0 && !this.conditionparticle.charbuffoff[0])
+              this.conditionparticle.ConditionparticleSet(5, 0);
+            this.conditionparticle.ConditionparticleSet(0, this.memberturget);
+          }
+          this.PTste.partystatus[this.memberturget].condition_pos += 800;
+          Text info = this.Info;
+          info.text = info.text + "\n" + this.PTste.partystatus[this.memberturget].name + "は毒になった";
+          break;
+        }
+        break;
+      case 5:
+        this.GoblinAtk();
+        this.damage = enemste.power - this.PTste.partystatus[this.memberturget].ice_ / 4;
+        this.BaffDamageCut();
+        this.ConditionReset();
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        this.batlemana.ptmotion[this.memberturget].SetFloat("damage", 1f);
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = enemste.name + "の水泡攻撃\n" + this.PTste.partystatus[this.memberturget].name + "は" + (object) this.damage + "のダメージを受けた";
+        break;
+      case 6:
+        this.GoblinAtk();
+        this.damage = enemste.power * 2 - this.PTste.partystatus[this.memberturget].deff;
+        this.BaffDamageCut();
+        this.ConditionReset();
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = enemste.name + "の切り裂き攻撃\n" + this.PTste.partystatus[this.memberturget].name + "は" + (object) this.damage + "のダメージを受けた";
+        break;
+      case 7:
+        this.GoblinAtk();
+        int num = Random.Range(0, 3);
+        this.ConditionReset();
+        switch (num)
+        {
+          case 0:
+            this.Info.GetComponent<Text>().text = enemste.name + "の毒粉攻撃\n";
+            this.condition_up = Random.Range(0, 100);
+            if (this.PTste.partystatus[this.memberturget].poison_ <= 50 + this.condition_up)
+            {
+              if (!this.conditionparticle.offpoison[this.memberturget])
+              {
+                if (this.memberturget == 0 && !this.conditionparticle.charbuffoff[0])
+                  this.conditionparticle.ConditionparticleSet(5, 0);
+                this.conditionparticle.ConditionparticleSet(0, this.memberturget);
+              }
+              this.PTste.partystatus[this.memberturget].condition_pos += 1000;
+              Text info = this.Info;
+              info.text = info.text + this.PTste.partystatus[this.memberturget].name + "は毒になった";
+              break;
+            }
+            break;
+          case 1:
+            this.Info.text = enemste.name + "の麻痺粉攻撃\n";
+            this.condition_up = Random.Range(0, 100);
+            if (this.PTste.partystatus[this.memberturget].pris_ <= 50 + this.condition_up)
+            {
+              if (!this.conditionparticle.offpriz[this.memberturget])
+              {
+                if (this.memberturget == 0 && !this.conditionparticle.charbuffoff[0])
+                  this.conditionparticle.ConditionparticleSet(5, 0);
+                this.conditionparticle.ConditionparticleSet(1, this.memberturget);
+              }
+              this.PTste.partystatus[this.memberturget].condition_pri += 200;
+              Text info = this.Info;
+              info.text = info.text + this.PTste.partystatus[this.memberturget].name + "は麻痺した";
+              break;
+            }
+            break;
+          default:
+            this.Info.text = enemste.name + "の睡眠粉攻撃\n";
+            this.condition_up = Random.Range(0, 10);
+            if (this.PTste.partystatus[this.memberturget].sleeep_ <= 50 + this.condition_up)
+            {
+              if (!this.conditionparticle.offsleep[this.memberturget])
+              {
+                if (this.memberturget == 0 && !this.conditionparticle.charbuffoff[0])
+                  this.conditionparticle.ConditionparticleSet(5, 0);
+                this.conditionparticle.ConditionparticleSet(2, this.memberturget);
+              }
+              this.PTste.partystatus[this.memberturget].condition_sleeep += 600;
+              Text info = this.Info;
+              info.text = info.text + "\n" + this.PTste.partystatus[this.memberturget].name + "は眠った";
+            }
+            break;
+        }
+      case 8:
+        this.GoblinAtk();
+        this.damage = enemste.power - this.PTste.partystatus[this.memberturget].deff;
+        this.BaffDamageCut();
+        this.ConditionReset();
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = enemste.name + "の殴りつけ攻撃\n" + this.PTste.partystatus[this.memberturget].name + "は" + (object) this.damage + "のダメージを受けた";
+        break;
+      case 9:
+        if (enemste.defup < 50)
+          enemste.defup += 5;
+        this.ConditionReset();
+        this.Info.text = enemste.name + "はウォールを発動。\n" + enemste.name + "の防御力が上がった";
+        break;
+      case 10:
+        this.GoblinAtk();
+        this.damage = (int) ((double) enemste.INT * (double) (1 + enemste.magicup / 100)) - this.PTste.partystatus[this.memberturget].magic_ / 2;
+        this.BaffDamageCut();
+        this.ConditionReset();
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = enemste.name + "のストーン\n" + this.PTste.partystatus[this.memberturget].name + "は" + (object) this.damage + "のダメージを受けた";
+        break;
+      case 11:
+        this.GoblinAtk();
+        this.damage = (int) ((double) enemste.INT * (double) (1 + enemste.magicup / 100)) - (this.PTste.partystatus[this.memberturget].magic_ / 2 + this.PTste.partystatus[this.memberturget].ice_ / 2);
+        this.BaffDamageCut();
+        this.ConditionReset();
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = enemste.name + "のスプラッシュ\n" + this.PTste.partystatus[this.memberturget].name + "は" + (object) this.damage + "のダメージを受けた";
+        this.condition_up = Random.Range(0, 100);
+        if (this.PTste.partystatus[this.memberturget].poison_ <= 50 + this.condition_up)
+        {
+          if (!this.conditionparticle.offpoison[this.memberturget])
+          {
+            if (this.memberturget == 0 && !this.conditionparticle.charbuffoff[0])
+              this.conditionparticle.ConditionparticleSet(5, 0);
+            this.conditionparticle.ConditionparticleSet(0, this.memberturget);
+          }
+          this.PTste.partystatus[this.memberturget].condition_pos += 300;
+          Text info = this.Info;
+          info.text = info.text + "\n" + this.PTste.partystatus[this.memberturget].name + "は毒になった";
+          break;
+        }
+        break;
+      case 12:
+        this.GoblinAtk();
+        this.damage = (int) ((double) enemste.INT * (double) (1 + enemste.magicup / 100)) - (this.PTste.partystatus[this.memberturget].magic_ / 2 + this.PTste.partystatus[this.memberturget].fire_ / 2);
+        this.BaffDamageCut();
+        this.ConditionReset();
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = enemste.name + "のファイア\n" + this.PTste.partystatus[this.memberturget].name + "は" + (object) this.damage + "のダメージを受けた";
+        this.condition_up = Random.Range(0, 100);
+        if (this.PTste.partystatus[this.memberturget].yakedo_ <= 50 + this.condition_up)
+        {
+          if (this.memberturget == 0 && !this.conditionparticle.charbuffoff[0])
+            this.conditionparticle.ConditionparticleSet(5, 0);
+          this.conditionparticle.ConditionparticleSet(0, this.memberturget);
+          this.PTste.partystatus[this.memberturget].condition_yakedo += 300;
+          Text info = this.Info;
+          info.text = info.text + "\n" + this.PTste.partystatus[this.memberturget].name + "は火傷した";
+          break;
+        }
+        break;
+      case 13:
+        this.GoblinAtk();
+        this.damage = (int) ((double) enemste.INT * (double) (1 + enemste.magicup / 100)) - (this.PTste.partystatus[this.memberturget].magic_ / 2 + this.PTste.partystatus[this.memberturget].shine_ / 2);
+        this.BaffDamageCut();
+        this.ConditionReset();
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = enemste.name + "のシャイン\n" + this.PTste.partystatus[this.memberturget].name + "は" + (object) this.damage + "のダメージを受けた";
+        this.condition_up = Random.Range(0, 100);
+        if (this.PTste.partystatus[this.memberturget].pris_ <= 50 + this.condition_up)
+        {
+          if (!this.conditionparticle.offpriz[this.memberturget])
+          {
+            if (this.memberturget == 0 && !this.conditionparticle.charbuffoff[0])
+              this.conditionparticle.ConditionparticleSet(5, 0);
+            this.conditionparticle.ConditionparticleSet(1, this.memberturget);
+          }
+          this.PTste.partystatus[this.memberturget].condition_pri += 300;
+          Text info = this.Info;
+          info.text = info.text + "\n" + this.PTste.partystatus[this.memberturget].name + "は麻痺した";
+          break;
+        }
+        break;
+      case 14:
+        this.GoblinAtk();
+        this.damage = (int) ((double) enemste.INT * (double) (1 + enemste.magicup / 100)) - (this.PTste.partystatus[this.memberturget].magic_ / 2 + this.PTste.partystatus[this.memberturget].dark_ / 2);
+        this.BaffDamageCut();
+        this.ConditionReset();
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = enemste.name + "のダーク\n" + this.PTste.partystatus[this.memberturget].name + "は" + (object) this.damage + "のダメージを受けた";
+        this.condition_up = Random.Range(0, 100);
+        if (this.PTste.partystatus[this.memberturget].brin_ <= 50 + this.condition_up)
+        {
+          if (!this.conditionparticle.offpoison[this.memberturget])
+          {
+            if (this.memberturget == 0 && !this.conditionparticle.charbuffoff[0])
+              this.conditionparticle.ConditionparticleSet(5, 0);
+            this.conditionparticle.ConditionparticleSet(3, this.memberturget);
+          }
+          this.PTste.partystatus[this.memberturget].condition_brin += 300;
+          Text info = this.Info;
+          info.text = info.text + "\n" + this.PTste.partystatus[this.memberturget].name + "は暗闇状態になった";
+          break;
+        }
+        break;
+      case 15:
+        this.GoblinAtk();
+        this.damage = (int) ((double) enemste.INT * (double) enemste.magicup / 100.0) - this.PTste.partystatus[this.memberturget].magic_;
+        this.BaffDamageCut();
+        this.PTste.partystatus[this.memberturget].MP -= this.damage;
+        if (enemste.magicup <= 50)
+          enemste.magicup += 3;
+        this.ConditionReset();
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = enemste.name + "のエナジーブレイク\n" + this.PTste.partystatus[this.memberturget].name + "はHPとMPに" + (object) this.damage + "のダメージを受けた";
+        break;
+      case 16:
+        this.GoblinAtk();
+        this.damage = enemste.power - this.PTste.partystatus[this.memberturget].deff;
+        this.BaffDamageCut();
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = enemste.name + "のハイタックル\n" + this.PTste.partystatus[this.memberturget].name + "は" + (object) this.damage + "のダメージを受けた";
+        if (Random.Range(0, 100) < 50)
+        {
+          this.batlemana.ATBbar_party[this.memberturget].GetComponent<Image>().fillAmount -= 0.3f;
+          Text info = this.Info;
+          info.text = info.text + "\n" + this.PTste.partystatus[this.memberturget].name + "はのけぞった";
+        }
+        this.ConditionReset();
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = enemste.name + "のハイタックル\n" + this.PTste.partystatus[this.memberturget].name + "は" + (object) this.damage + "のダメージを受けた";
+        break;
+      case 17:
+        for (this.memberturget = 0; this.memberturget < 4; ++this.memberturget)
+        {
+          if (this.menu.charpartyflag[this.j])
+          {
+            this.damage = (int) ((double) enemste.pos_ * 1.10000002384186) - this.PTste.partystatus[this.j].deff;
+            this.BaffDamageCut();
+            this.ConditionReset();
+            this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+            --this.PTskill.sumire_count[this.memberturget];
+          }
+        }
+        this.Info.text = enemste.name + "はラウンドスラッシュを放った\n" + (object) this.damage + "のダメージを受けた";
+        break;
+      case 20:
+        this.GoblinAtk();
+        this.damage = enemste.INT - this.PTste.partystatus[this.memberturget].magic_ / 5;
+        this.BaffDamageCut();
+        this.ConditionReset();
+        this.Partys[this.memberturget].GetComponent<BattleMotion>().motionnomal = false;
+        --this.PTskill.sumire_count[this.memberturget];
+        this.Info.text = enemste.name + "の桜花漸烈閃\n" + this.PTste.partystatus[this.memberturget].name + "は" + (object) this.damage + "のダメージを受けた";
+        break;
+    }
+    this.LateAttack();
+  }
+
+  public void ConditionReset()
+  {
+    if (this.PTste.partystatus[this.memberturget].gatu && this.PTste.partystatus[this.memberturget].HP <= 0)
+    {
+      this.PTste.partystatus[this.memberturget].HP = this.PTste.partystatus[this.memberturget].maxHP / 100;
+      this.PTste.partystatus[this.memberturget].gatu = false;
+    }
+    if (this.PTste.partystatus[this.memberturget].condition_sleeep <= 0)
+      return;
+    this.PTste.partystatus[this.memberturget].condition_sleeep = 0;
+    this.conditionparticle.Destroyparticle(this.memberturget);
+  }
+
+  public void GoblinAtk()
+  {
+    if (this.PTskill.kikyou > 0)
+    {
+      this.memberturget = 1;
+    }
+    else
+    {
+      while (!this.menu.charpartyflag[this.target] || this.PTste.partystatus[this.target].HP < 0)
+        this.target = Random.Range(0, 4);
+      this.memberturget = this.target;
+    }
+  }
+
+  public void BaffDamageCut()
+  {
+    if (this.PTskill.sumire_count[this.memberturget] > 0)
+      this.damage -= this.PTskill.sumireup;
+    if (this.PTste.suzuran[this.memberturget] > 0)
+      this.damage /= this.PTste.suzuran_get;
+    if (this.damage < 0)
+      this.damage = 0;
+    if (this.PTskill.materiabaria > 0)
+      this.PTste.partystatus[this.memberturget].MP += this.damage * 3 / 10;
+    else
+      this.PTste.partystatus[this.memberturget].HP -= this.damage;
+  }
+
+  public void LateAttack()
+  {
+    --this.batlemana.turnwait;
+  }
+}

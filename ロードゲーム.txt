@@ -1,0 +1,64 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class LoadStartPosition : MonoBehaviour
+{
+  private Vector3 startposition = new Vector3(0.0f, 0.0f, 0.0f);
+  private float name_y = -10f;
+  private bool feedouting = true;
+  public GameObject player;
+  private GameObject gameMana;
+  private Image feedout;
+  private MenuOpen menu;
+  private Quaternion startrotation;
+  private StartPosition start;
+  private float posx;
+  private float posy;
+  private float posz;
+  private float qx;
+  private float qy;
+  private float qz;
+  private float texy;
+  public string mapname;
+
+  private void Start()
+  {
+    this.texy = 1f;
+    this.feedout = GameObject.Find("feedout").GetComponent<Image>();
+    this.gameMana = GameObject.Find("GameManager");
+    this.start = this.gameMana.GetComponent<StartPosition>();
+    this.menu = this.gameMana.GetComponent<MenuOpen>();
+    this.posx = this.start.startpos.x;
+    this.posy = this.start.startpos.y;
+    this.posz = this.start.startpos.z;
+    this.qx = this.start.qx;
+    this.qy = this.start.qy;
+    this.qz = this.start.qz;
+    this.startposition = new Vector3(this.posx, this.posy, this.posz);
+    this.startrotation = Quaternion.Euler(this.qx, this.qy, this.qz);
+    this.player.transform.position = this.startposition;
+    this.player.transform.rotation = this.startrotation;
+  }
+
+  private void OnGUI()
+  {
+    if (this.menu.menuID != 0)
+      return;
+    if ((double) this.texy >= 0.0)
+    {
+      this.texy -= 0.1f;
+      this.feedout.color = new Color(0.0f, 0.0f, 0.0f, this.texy);
+    }
+    else
+      this.feedouting = false;
+    if (!this.menu.talkflag && !this.feedouting)
+    {
+      if ((double) this.name_y <= 20.0)
+      {
+        this.name_y += 0.3f;
+        GUI.Label(new Rect(200f, this.name_y, 200f, this.name_y + 100f), "" + this.mapname);
+      }
+      GUI.Label(new Rect(200f, this.name_y, 200f, this.name_y + 100f), "" + this.mapname);
+    }
+  }
+}

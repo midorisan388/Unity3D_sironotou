@@ -1,0 +1,26 @@
+using UnityEngine;
+
+[CreateAssetMenu]
+public class CharSkilldata : ScriptableObject
+{
+  public string[] ATKSkillname = new string[19];
+  public string[] DEFSkillname = new string[19];
+  public string[] ENHSkillname = new string[19];
+  public string[] JAMSkillname = new string[19];
+  [Multiline]
+  public string[] ATKSkilldiscrip = new string[19];
+  [Multiline]
+  public string[] DEFSkilldiscrip = new string[19];
+  [Multiline]
+  public string[] ENHSkilldiscrip = new string[19];
+  [Multiline]
+  public string[] JAMSkilldiscrip = new string[19];
+  public int[] ATKSkillneept = new int[19];
+  public int[] DEFSkillneept = new int[19];
+  public int[] ENHSkillneept = new int[19];
+  public int[] JAMSkillneept = new int[19];
+  public int[] ATKSkillMP = new int[19];
+  public int[] DEFSkillMP = new int[19];
+  public int[] ENHSkillMP = new int[19];
+  public int[] JAMSkillMP = new int[19];
+}

@@ -1,0 +1,126 @@
+using UnityEngine;
+
+public class PlayerMove : MonoBehaviour
+{
+  public float mouseSensitivity = 10f;
+  public float mouseYPosition = 1f;
+  public float moveSpeed = 2f;
+  private bool Run_ = true;
+  public float zoomSpeed = 2f;
+  public float zoomMin = -2f;
+  public float zoomMax = -10f;
+  public float rotationSpeed = 10f;
+  public Transform playerCam;
+  public Transform character;
+  public Transform centerPoint;
+  public Transform plyModelrotation;
+  private Animator anim;
+  private Quaternion turnAngle;
+  private GameObject gamemna;
+  private MenuOpen menu;
+  private SystemMenu system;
+  public float mouseX;
+  public float mouseY;
+  private float moveFB;
+  private float moveLR;
+  public float movespeed_Npmal;
+  public float movespeed_up;
+  public float zoom;
+  private float centurAngle;
+  public static int t;
+
+  private void Start()
+  {
+    this.anim = this.character.GetComponent<Animator>();
+    this.gamemna = GameObject.Find("GameManager");
+    this.system = this.gamemna.GetComponent<SystemMenu>();
+    this.menu = this.gamemna.GetComponent<MenuOpen>();
+    this.zoom = -3f;
+  }
+
+  private void Update()
+  {
+    if (this.menu.menuID != 0 || this.menu.talkflag)
+      return;
+    if (Input.GetButtonDown("Fire2"))
+    {
+      if (!this.Run_)
+      {
+        this.moveSpeed = this.movespeed_up;
+        this.Run_ = true;
+      }
+      else
+      {
+        this.moveSpeed = this.movespeed_Npmal;
+        this.Run_ = false;
+      }
+    }
+    if ((double) Input.GetAxis("Vertical") != 0.0 || (double) Input.GetAxis("Horizontal") != 0.0)
+    {
+      if (this.Run_)
+        this.anim.SetFloat("run", 1f);
+      else
+        this.anim.SetFloat("walk", 1f);
+      ++PlayerMove.t;
+    }
+    else
+    {
+      this.anim.SetFloat("walk", 0.0f);
+      this.anim.SetFloat("run", 0.0f);
+    }
+    if ((double) Input.GetAxis("Mouse ScrollWheel") != 0.0)
+      this.zoom += Input.GetAxis("Mouse ScrollWheel") * this.system.Mouseples;
+    if ((double) this.zoom <= (double) this.zoomMin)
+      this.zoom = this.zoomMin;
+    if ((double) this.zoom >= (double) this.zoomMax)
+      this.zoom = this.zoomMax;
+    this.playerCam.transform.localPosition = new Vector3(0.0f, 0.0f, this.zoom);
+    if (Input.GetMouseButton(1))
+    {
+      this.mouseX += Input.GetAxis("Mouse X") * this.system.Mouseples;
+      this.mouseY -= Input.GetAxis("Mouse Y") * this.system.Mouseples;
+    }
+    else
+    {
+      if ((double) Input.GetAxisRaw("Vertical2") != 0.0)
+      {
+        if (Input.GetButton("Fire5"))
+          this.zoom += Input.GetAxis("Vertical2") * Time.deltaTime;
+        else
+          this.mouseY -= Input.GetAxisRaw("Vertical2");
+      }
+      if ((double) Input.GetAxisRaw("Horizontal2") != 0.0)
+        this.mouseX += Input.GetAxisRaw("Horizontal2");
+    }
+    this.mouseY = Mathf.Clamp(this.mouseY, -60f, 60f);
+    this.centerPoint.localRotation = Quaternion.Euler(this.mouseY, this.mouseX, 0.0f);
+    this.playerCam.LookAt(this.centerPoint);
+    this.moveFB = Input.GetAxis("Vertical") * this.moveSpeed;
+    this.moveLR = Input.GetAxis("Horizontal") * this.moveSpeed;
+    Vector3 vector3 = new Vector3(this.moveLR, 0.0f, this.moveFB);
+    vector3 = this.character.rotation * vector3;
+    int num = (int) this.character.GetComponent<CharacterController>().Move(vector3 * Time.deltaTime);
+    this.centerPoint.position = new Vector3(this.character.position.x, this.character.position.y + this.mouseYPosition, this.character.position.z);
+    if ((double) Input.GetAxis("Vertical") > 0.0)
+      this.centurAngle = this.mouseX + 45f * Input.GetAxis("Horizontal");
+    else if ((double) Input.GetAxis("Vertical") < 0.0)
+      this.centurAngle = (float) ((double) this.mouseX + 180.0 - 45.0 * (double) Input.GetAxis("Horizontal"));
+    else if ((double) Input.GetAxis("Horizontal") > 0.0)
+      this.centurAngle = (float) ((double) this.mouseX + 90.0 - 45.0 * (double) Input.GetAxis("Vertical"));
+    else if ((double) Input.GetAxis("Horizontal") < 0.0)
+      this.centurAngle = (float) ((double) this.mouseX - 90.0 + 45.0 * (double) Input.GetAxis("Vertical"));
+    if ((double) Input.GetAxis("Vertical") > 0.0 | (double) Input.GetAxis("Vertical") < 0.0 | (double) Input.GetAxis("Horizontal") < 0.0 | (double) Input.GetAxis("Horizontal") > 0.0)
+    {
+      this.turnAngle = Quaternion.Euler(0.0f, this.centerPoint.eulerAngles.y, 0.0f);
+      this.character.rotation = Quaternion.Slerp(this.character.rotation, this.turnAngle, Time.deltaTime * this.rotationSpeed);
+      this.plyModelrotation.rotation = Quaternion.Euler(0.0f, this.centurAngle, 0.0f);
+    }
+    if (Input.GetButtonDown("Fire1"))
+    {
+      if ((double) this.mouseX > 999.0)
+        this.mouseX -= 180f;
+      else
+        this.mouseX += 180f;
+    }
+  }
+}

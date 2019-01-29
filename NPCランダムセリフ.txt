@@ -1,0 +1,73 @@
+using UnityEngine;
+
+public class NPCRandammove : MonoBehaviour
+{
+  public bool plystay = false;
+  public float speed = 1f;
+  public float Basewaittime = 5f;
+  private MenuOpen menu;
+  private GameObject _cube;
+  private Vector3 targetPosition;
+  private Vector3 basePosition;
+  public float moveTime;
+  public float waitTime;
+
+  private void Start()
+  {
+    this.menu = GameObject.Find("GameManager").GetComponent<MenuOpen>();
+    this._cube = this.gameObject;
+    this.targetPosition = this.GetRandomPosition();
+    this.basePosition = this.transform.position;
+    this.moveTime = Random.Range(0.0f, 5f);
+    this.waitTime = this.Basewaittime;
+  }
+
+  private void OnTriggerEnter(Collider other)
+  {
+    if (!(other.tag == "Player"))
+      return;
+    this.plystay = true;
+  }
+
+  private void OnTriggerExit(Collider other)
+  {
+    if (!(other.tag == "Player"))
+      return;
+    this.plystay = false;
+  }
+
+  private void Update()
+  {
+    if (this.menu.talkflag || this.plystay)
+      return;
+    this.waitTime += Time.deltaTime;
+    if ((double) this.waitTime > (double) this.Basewaittime)
+    {
+      this.moveTime -= Time.deltaTime;
+      if ((double) this.moveTime >= 0.0)
+      {
+        this._cube.transform.Translate(Vector3.forward * this.speed * Time.deltaTime);
+        this._cube.transform.rotation = Quaternion.Slerp(this._cube.transform.rotation, Quaternion.LookRotation(this.targetPosition - this._cube.transform.position), Time.deltaTime / 2f);
+      }
+      if ((double) this.moveTime < 0.0)
+      {
+        this.waitTime = 0.0f;
+        this.moveTime = this.Basewaittime;
+        this.waitTime -= Time.deltaTime;
+        this.moveTime = this.MoveTime();
+        this.targetPosition = this.GetRandomPosition();
+      }
+    }
+  }
+
+  public Vector3 GetRandomPosition()
+  {
+    float max = 1f;
+    return new Vector3(this.basePosition.x + Random.Range(-max, max), this.basePosition.y, this.basePosition.z + Random.Range(-max, max));
+  }
+
+  public float MoveTime()
+  {
+    return (float) Random.Range(0, 5);
+  }
+}

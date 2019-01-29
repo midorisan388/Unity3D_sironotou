@@ -1,0 +1,14 @@
+using UnityEngine;
+
+public class AreaRiset : MonoBehaviour
+{
+  public Vector3 risetpos;
+  public GameObject Player;
+
+  private void OnTriggerEnter(Collider other)
+  {
+    if (!(other.tag == "Player"))
+      return;
+    this.Player.transform.position = this.risetpos;
+  }
+}

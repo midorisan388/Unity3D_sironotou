@@ -1,0 +1,60 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class EventTalking : MonoBehaviour
+{
+  private int timer;
+  private int tutrial_count;
+  public Text Info;
+  private BattleturnManager batllemana;
+  private MenuOpen menu;
+
+  private void Start()
+  {
+    this.batllemana = this.GetComponent<BattleturnManager>();
+    this.menu = GameObject.Find("GameManager").GetComponent<MenuOpen>();
+  }
+
+  private void Update()
+  {
+    ++this.timer;
+    if (this.menu.story == 7 && this.tutrial_count == 0)
+    {
+      if (this.timer >= 150)
+      {
+        this.batllemana.talking = true;
+        this.Info.text = "イヴァン:この魔物…強そうだけど隙をつければ大きなダメージが与えられそう";
+      }
+      if (this.timer >= 400)
+        this.Info.text = "イヴァン:隙が見えるまでじっと頑張って耐えてみよう";
+      if (this.timer >= 650)
+      {
+        this.Info.text = "";
+        this.batllemana.talking = false;
+        this.timer = 0;
+        this.tutrial_count = 1;
+      }
+    }
+    if (this.menu.story != 20 || this.tutrial_count != 0)
+      return;
+    if (this.timer >= 150)
+    {
+      this.batllemana.talking = true;
+      this.Info.text = "ラン:こいつは私の魔法で燃やすわ";
+    }
+    if (this.timer >= 400)
+      this.Info.text = "ラン:エーテルが無くなったら【エーテルドロー】で魔力を整えるから";
+    if (this.timer >= 650)
+      this.Info.text = "ラン:私の準備が整うまで支援お願いね";
+    if (this.timer >= 900)
+      this.Info.text = "イヴァン:は、はい！頑張ります！！";
+    if (this.timer >= 1150)
+    {
+      this.Info.text = "";
+      ++this.menu.story;
+      this.batllemana.talking = false;
+      this.timer = 0;
+      this.tutrial_count = 1;
+    }
+  }
+}

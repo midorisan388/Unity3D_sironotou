@@ -1,0 +1,9 @@
+using UnityEngine;
+
+public class StartPosition : MonoBehaviour
+{
+  public Vector3 startpos = new Vector3(0.0f, 0.0f, 0.0f);
+  public float qx;
+  public float qy;
+  public float qz;
+}

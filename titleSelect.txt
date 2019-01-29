@@ -1,0 +1,163 @@
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class Titleselect : MonoBehaviour
+{
+  public static bool New = false;
+  public static bool Load = false;
+  private int select_mode = 0;
+  private Color loadscreen = new Color(0.0f, 0.0f, 0.0f, 1f);
+  private int[] startlevel = new int[4]{ 1, 15, 10, 15 };
+  private StartPosition start;
+  private GameObject gmanager;
+  private MenuOpen menu;
+  private PartyStetus PTste;
+  private ItemList itemlis;
+  private WeponMenu weponmenu;
+  private WeponList weponlist;
+  private SkillMenu PTskills;
+  private TitleEffect titlefe;
+  private ScrollController subque;
+  private int LoadGame;
+  private int loadscene;
+  private int i;
+  private int j;
+  private int waitime;
+  public GameObject[] Startbutton;
+  public Image titlescreen;
+
+  private void Start()
+  {
+    this.gmanager = GameObject.Find("GameManager");
+    this.start = this.gmanager.GetComponent<StartPosition>();
+    this.menu = this.gmanager.GetComponent<MenuOpen>();
+    this.titlefe = GameObject.Find("titleeffect").GetComponent<TitleEffect>();
+    this.itemlis = this.gmanager.GetComponent<ItemList>();
+    this.menu = this.gmanager.GetComponent<MenuOpen>();
+    this.weponmenu = this.gmanager.GetComponent<WeponMenu>();
+    this.weponlist = this.gmanager.GetComponent<WeponList>();
+    this.PTste = this.gmanager.GetComponent<PartyStetus>();
+    this.PTskills = this.gmanager.GetComponent<SkillMenu>();
+    this.subque = this.gmanager.GetComponent<ScrollController>();
+    this.LoadGame = PlayerPrefs.GetInt("Load", 0);
+  }
+
+  private void Update()
+  {
+    if (!this.titlefe.titlesel)
+      return;
+    ++this.waitime;
+    this.Startbutton[1].SetActive(true);
+    if (this.LoadGame == 1)
+      this.Startbutton[0].SetActive(true);
+    else
+      this.Startbutton[0].SetActive(false);
+    this.menu.menuID = Titleselect.Load || Titleselect.New ? 0 : -2;
+    this.Startbutton[this.select_mode].GetComponent<Button>().Select();
+    if (this.waitime >= 10)
+    {
+      if ((double) Input.GetAxis("Vertical") > 0.0)
+      {
+        this.waitime = 0;
+        this.select_mode = 1;
+      }
+      if ((double) Input.GetAxis("Vertical") < 0.0)
+      {
+        this.waitime = 0;
+        this.select_mode = 0;
+      }
+      if (Input.GetButtonDown("Fire3"))
+      {
+        this.waitime = 0;
+        if (this.select_mode == 0)
+          this.GameStart(2);
+        if (this.select_mode == 1)
+          this.GameStart(1);
+      }
+    }
+  }
+
+  public void GameStart(int mode)
+  {
+    this.titlescreen.enabled = true;
+    this.titlescreen.color = this.loadscreen;
+    if (!this.titlefe.titlesel)
+      return;
+    switch (mode)
+    {
+      case 1:
+        Titleselect.New = true;
+        Titleselect.Load = false;
+        for (this.i = 0; this.i < 4; ++this.i)
+        {
+          this.PTste.partystatus[this.i].level = this.startlevel[this.i];
+          this.PTskills.skillpoint[this.i] = 0;
+          for (int index1 = 0; index1 < 4; ++index1)
+          {
+            for (int index2 = 1; index2 < 19; ++index2)
+              this.PTskills.Skilllean_bool[this.i, index1, index2] = 0;
+            this.PTskills.Skilllean_bool[this.i, index1, 0] = 1;
+          }
+        }
+        this.menu.menuID = 0;
+        SceneManager.LoadScene(1);
+        break;
+      case 2:
+        if (this.LoadGame == 1)
+        {
+          Titleselect.Load = true;
+          Titleselect.New = false;
+          this.loadscene = PlayerPrefs.GetInt("SaveScene", 1);
+          this.menu.money = PlayerPrefs.GetInt("money", 100);
+          this.menu.story = PlayerPrefs.GetInt("Story", 0);
+          if (PlayerPrefs.GetInt("Warpflag") == 1)
+          {
+            this.menu.warpflag_ = true;
+            this.menu.areawarp = new Vector3(PlayerPrefs.GetFloat("warp_pos_x"), PlayerPrefs.GetFloat("warp_pos_y"), PlayerPrefs.GetFloat("warp_pos_z"));
+          }
+          for (this.i = 0; this.i < 4; ++this.i)
+          {
+            this.PTste.partystatus[this.i].level = PlayerPrefs.GetInt("_level" + (object) this.i, this.startlevel[this.i]);
+            this.PTste.partystatus[this.i].HP = this.PTste.partystatus[this.i].MP = 99999;
+          }
+          this.ItemLoad();
+          this.start.startpos.x = PlayerPrefs.GetFloat("savepos_x") + 0.1f;
+          this.start.startpos.y = PlayerPrefs.GetFloat("savepos_y");
+          this.start.startpos.z = PlayerPrefs.GetFloat("savepos_z") + 0.1f;
+          this.menu.menuID = 0;
+          SceneManager.LoadScene(this.loadscene);
+        }
+        break;
+    }
+  }
+
+  public void ItemLoad()
+  {
+    for (this.i = 0; this.i < 4; ++this.i)
+    {
+      this.PTskills.setskill_atk[this.i] = PlayerPrefs.GetInt("atkaction[" + (object) this.i + "]", 0);
+      this.PTskills.setskill_def[this.i] = PlayerPrefs.GetInt("defaction[" + (object) this.i + "]", 0);
+      this.PTskills.setskill_enh[this.i] = PlayerPrefs.GetInt("enhaction[" + (object) this.i + "]", 0);
+      this.PTskills.setskill_jam[this.i] = PlayerPrefs.GetInt("jamaction[" + (object) this.i + "]", 0);
+      this.PTste.partystatus[this.i].haveexp = PlayerPrefs.GetInt("NeedEXP_" + (object) this.i, 0);
+      this.weponmenu.setID[this.i] = PlayerPrefs.GetInt("PTSetacse_ID" + (object) this.i, 0);
+      this.weponmenu.setID[this.i] = PlayerPrefs.GetInt("SetWepon" + (object) this.i, 0);
+      this.menu.charpartyflag[this.i] = PlayerPrefs.GetInt("Datakey[" + (object) this.i + "]") == 1;
+    }
+    this.PTste.Drivegage = PlayerPrefs.GetFloat("Drivefall", 0.0f);
+    for (this.i = 0; this.i < 44; ++this.i)
+    {
+      this.itemlis.itemhave_con[this.i] = PlayerPrefs.GetInt("Itemhave_con_[" + (object) this.i + "]", 0);
+      this.itemlis.itemhave_mat[this.i] = PlayerPrefs.GetInt("Itemhave_mat_[" + (object) this.i + "]", 0);
+      this.itemlis.itemhave_imp[this.i] = PlayerPrefs.GetInt("Itemhave_imp_[" + (object) this.i + "]", 0);
+      this.weponlist.acsehave[this.i] = PlayerPrefs.GetInt("Accse_have_" + (object) this.i, 0);
+    }
+    for (this.i = 0; this.i < 16; ++this.i)
+    {
+      this.subque.Qest_clearcount[this.i] = PlayerPrefs.GetInt("Questcout" + (object) this.i, 0);
+      if (PlayerPrefs.GetInt("QuestClearflag" + (object) this.i) == 1)
+        this.subque.QestClearflag[this.i] = true;
+    }
+  }
+}

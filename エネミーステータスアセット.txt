@@ -1,0 +1,96 @@
+using UnityEngine;
+
+[CreateAssetMenu]
+public class EnemyStetus : ScriptableObject
+{
+  public int level;
+  public int ID;
+  public string name;
+  public int HP;
+  public int maxHP;
+  public int power;
+  public int INT;
+  public float dex;
+  public int getEXP;
+  public int getmoney;
+  public int dropitem;
+  public int dropup;
+  public int conditionNo;
+  public int[] use_skillID;
+  public int damagecut;
+  public int magiccut;
+  public int firecut;
+  public int icecut;
+  public int shinecut;
+  public int darkcut;
+  public int condition_pos;
+  public int condition_pri;
+  public int condition_slep;
+  public int condition_charm;
+  public int condition_bri;
+  public int condition_zonbi;
+  public int condition_bakusan;
+  public int condition_yakedo;
+  public int pos_;
+  public int pri_;
+  public int slep_;
+  public int charm_;
+  public int bri_;
+  public int sokusi;
+  public int defup;
+  public int magicup;
+  public int powerup;
+  public int defdown;
+  public int magicdown;
+  public int powerdown;
+  [Multiline]
+  public string enemydiscription;
+  public GameObject emnemymodel;
+
+  public struct enemySt
+  {
+    public int level;
+    public int ID;
+    public string name;
+    public int HP;
+    public int maxHP;
+    public int power;
+    public int INT;
+    public float dex;
+    public int getEXP;
+    public int getmoney;
+    public int dropitem;
+    public int dropup;
+    public int conditionNo;
+    public int[] use_skillID;
+    public int damagecut;
+    public int magiccut;
+    public int firecut;
+    public int icecut;
+    public int shinecut;
+    public int darkcut;
+    public int condition_pos;
+    public int condition_pri;
+    public int condition_slep;
+    public int condition_charm;
+    public int condition_bri;
+    public int condition_zonbi;
+    public int condition_bakusan;
+    public int condition_yakedo;
+    public int pos_;
+    public int pri_;
+    public int slep_;
+    public int charm_;
+    public int bri_;
+    public int defup;
+    public int magicup;
+    public int powerup;
+    public int defdown;
+    public int magicdown;
+    public int powerdown;
+    public int sokusi;
+    [Multiline]
+    public string enemydiscription;
+    public GameObject emnemymodel;
+  }
+}

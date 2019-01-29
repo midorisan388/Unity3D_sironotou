@@ -1,0 +1,230 @@
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class SystemMenu : MonoBehaviour
+{
+  private List<Dropdown.OptionData> battlebgmlist = new List<Dropdown.OptionData>();
+  private float BGMfill = 0.0f;
+  private float SEfill = 0.0f;
+  private float mousefill = 0.0f;
+  private int effectswich = 0;
+  private int waitime = 0;
+  private int select_mode = 0;
+  private int crtl_mode = 0;
+  private bool helpmenumode = false;
+  public bool batllefect = false;
+  public float Mouseples = 1f;
+  private List<string> sizeoption = new List<string>();
+  private int currentresolution = 0;
+  private MenuOpen menu;
+  private AudioSource myaudio;
+  public AudioMixer mainaudio;
+  public Slider BGMslider;
+  public Slider Seslider;
+  public Slider Mousebar;
+  public GameObject helpsimage;
+  public Dropdown BGMlist;
+  public Text efefctbool;
+  public Dropdown winsize;
+  public AudioClip[] batlleBGM;
+  public AudioClip batlleBGM_sound;
+  public bool ExitGame;
+  public int BGM_select;
+  private Resolution[] resolutions;
+  private int time;
+  private int i;
+
+  private void Start()
+  {
+    this.BGMslider.value = PlayerPrefs.GetFloat("BGMbar", 0.5f);
+    this.Volume(PlayerPrefs.GetFloat("BGMbar", 0.5f));
+    this.Seslider.value = PlayerPrefs.GetFloat("SEbar", 0.5f);
+    this.SEVolume(this.Seslider.value);
+    this.Mousebar.value = PlayerPrefs.GetFloat("Mousebar", 1f);
+    this.batllefect = PlayerPrefs.GetInt("Effect") != 0;
+    this.resolutions = Screen.resolutions;
+    this.winsize.ClearOptions();
+    for (this.i = 0; this.i < this.resolutions.Length; ++this.i)
+    {
+      this.sizeoption.Add(this.resolutions[this.i].width.ToString() + "x" + (object) this.resolutions[this.i].height);
+      if (this.resolutions[this.i].width == Screen.currentResolution.width && this.resolutions[this.i].height == Screen.currentResolution.height)
+        this.currentresolution = this.i;
+    }
+    this.winsize.AddOptions(this.sizeoption);
+    this.winsize.value = this.currentresolution;
+    this.winsize.RefreshShownValue();
+    this.batlleBGM_sound = this.batlleBGM[0];
+    this.menu = this.GetComponent<MenuOpen>();
+    this.myaudio = this.GetComponent<AudioSource>();
+    Screen.SetResolution(800, 600, false);
+  }
+
+  private void Update()
+  {
+    ++this.time;
+    if (this.menu.menuID != 7)
+    {
+      this.crtl_mode = 0;
+      this.select_mode = 0;
+      this.myaudio.Pause();
+    }
+    else
+    {
+      if (!this.helpmenumode || this.time < 20)
+        return;
+      this.time = 0;
+      if (Input.GetKeyDown("space"))
+        this.helpsimage.SetActive(false);
+    }
+  }
+
+  public void Volume(float volume)
+  {
+    this.mainaudio.SetFloat("BGM", volume);
+  }
+
+  public void SEVolume(float volume)
+  {
+    this.mainaudio.SetFloat("SE", volume);
+  }
+
+  public void Glaphiccs(int quality)
+  {
+    QualitySettings.SetQualityLevel(quality);
+  }
+
+  public void FullScreen(bool full)
+  {
+    Screen.fullScreen = full;
+  }
+
+  public void ScreenSet(int resolutionID)
+  {
+    Resolution resolution = this.resolutions[resolutionID];
+    Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
+  }
+
+  public void SelectCrtl()
+  {
+    if (this.menu.menuID != 7)
+      return;
+    if (this.crtl_mode == 0)
+    {
+      ++this.waitime;
+      if (this.waitime >= 30)
+      {
+        if (Input.GetKeyDown("down") || (double) Input.GetAxisRaw("cross vertical") == -1.0 && this.select_mode < 5)
+        {
+          this.waitime = 0;
+          ++this.select_mode;
+        }
+        if (Input.GetKeyDown("up") || (double) Input.GetAxisRaw("cross vertical") == 1.0 && this.select_mode > 0)
+        {
+          this.waitime = 0;
+          --this.select_mode;
+        }
+      }
+    }
+    if (this.crtl_mode == 1)
+    {
+      ++this.waitime;
+      switch (this.select_mode)
+      {
+        case 0:
+          if (Input.GetKey("left") || (double) Input.GetAxisRaw("cross Horizontal") < 0.0 && (double) this.BGMslider.value > 0.0)
+            this.BGMslider.value -= 0.1f;
+          if (Input.GetKey("right") || (double) Input.GetAxisRaw("cross Horizontal") > 0.0 && (double) this.BGMslider.value < 1.0)
+          {
+            this.BGMslider.value += 0.1f;
+            break;
+          }
+          break;
+        case 1:
+          this.BGMlist.Select();
+          if (this.waitime >= 30)
+          {
+            if (Input.GetKeyDown("up") || (double) Input.GetAxisRaw("cross vertical") == 1.0 && this.BGMlist.value > 0)
+            {
+              this.waitime = 0;
+              --this.BGMlist.value;
+            }
+            if (Input.GetKeyDown("down") || (double) Input.GetAxisRaw("cross vertical") == -1.0 && this.BGMlist.value < 3)
+            {
+              this.waitime = 0;
+              ++this.BGMlist.value;
+            }
+            if (Input.GetButtonDown("Fire3"))
+            {
+              this.ChangeColor();
+              this.waitime = 0;
+              this.crtl_mode = 0;
+            }
+            break;
+          }
+          break;
+      }
+    }
+  }
+
+  public void EffectChenger()
+  {
+    if (this.batllefect)
+    {
+      this.batllefect = false;
+      this.efefctbool.text = "•\Ž¦‚·‚é";
+    }
+    else
+    {
+      this.batllefect = true;
+      this.efefctbool.text = "•\Ž¦‚µ‚È‚¢";
+    }
+  }
+
+  public void ChangeColor()
+  {
+    this.batlleBGM_sound = this.batlleBGM[this.BGMlist.value];
+    this.myaudio.clip = this.batlleBGM_sound;
+  }
+
+  public void MousePles(float mousepala)
+  {
+    this.Mouseples = mousepala;
+  }
+
+  public void BGMtest()
+  {
+    if (this.menu.menuID != 7)
+      return;
+    this.myaudio.Play();
+  }
+
+  public void ExitBotun(int n)
+  {
+    if (n == 0)
+      SceneManager.LoadScene(0);
+    else
+      Application.Quit();
+  }
+
+  public void Helpmenuenable()
+  {
+    this.helpsimage.SetActive(true);
+    this.helpmenumode = true;
+  }
+
+  public void SystemSave()
+  {
+    this.BGMfill = this.BGMslider.value;
+    this.SEfill = this.Seslider.value;
+    this.mousefill = this.Mousebar.value;
+    this.effectswich = !this.batllefect ? 0 : 1;
+    PlayerPrefs.SetFloat("BGMbar", this.BGMfill);
+    PlayerPrefs.SetFloat("SEbar", this.SEfill);
+    PlayerPrefs.SetFloat("Mousebar", this.mousefill);
+    PlayerPrefs.SetInt("Effect", this.effectswich);
+    PlayerPrefs.Save();
+  }
+}

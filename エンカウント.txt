@@ -1,0 +1,7 @@
+using UnityEngine;
+
+public class EncountDate : MonoBehaviour
+{
+  [SerializeField]
+  public EnemyStetus[] enemySt;
+}

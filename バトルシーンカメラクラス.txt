@@ -1,0 +1,139 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public class BattleCam : MonoBehaviour
+{
+  private float posx = 26f;
+  public GameObject target;
+  public string cam_mode;
+  private int timer;
+  private int eventflag;
+  private float speed;
+
+  private void Start()
+  {
+    this.cam_mode = "start";
+  }
+
+  private void Update()
+  {
+    string camMode = this.cam_mode;
+    if (camMode == null)
+      return;
+    // ISSUE: reference to a compiler-generated field
+    if (BattleCam.\u003C\u003Ef__switch\u0024map0 == null)
+    {
+      // ISSUE: reference to a compiler-generated field
+      BattleCam.\u003C\u003Ef__switch\u0024map0 = new Dictionary<string, int>(9)
+      {
+        {
+          "start",
+          0
+        },
+        {
+          "sp_ivan",
+          1
+        },
+        {
+          "sp_fog",
+          2
+        },
+        {
+          "sp_ran",
+          3
+        },
+        {
+          "sp_mido",
+          4
+        },
+        {
+          "critical",
+          5
+        },
+        {
+          "end",
+          6
+        },
+        {
+          "nomal",
+          7
+        },
+        {
+          "lose",
+          8
+        }
+      };
+    }
+    int num;
+    // ISSUE: reference to a compiler-generated field
+    if (!BattleCam.\u003C\u003Ef__switch\u0024map0.TryGetValue(camMode, out num))
+      return;
+    switch (num)
+    {
+      case 0:
+        if ((double) this.transform.position.x > 0.0)
+        {
+          this.transform.position = new Vector3(this.posx, 7f, -1.4f);
+          this.posx -= 0.5f;
+          break;
+        }
+        this.cam_mode = "nomal";
+        break;
+      case 1:
+        this.Sp_ivan();
+        break;
+      case 2:
+        this.Sp_fog();
+        break;
+      case 3:
+        this.Sp_ran();
+        break;
+      case 4:
+        this.Sp_mido();
+        break;
+      case 5:
+        this.Critical(this.target);
+        break;
+      case 6:
+        this.transform.position = new Vector3(-1.25f, 5.6f, 1.5f);
+        this.transform.rotation = new Quaternion(0.0f, 180f, 0.0f, 0.0f);
+        break;
+      case 7:
+        this.transform.position = new Vector3(-1.9f, 5.6f, -11.4f);
+        this.transform.rotation = new Quaternion(0.0f, 0.0f, 0.0f, 0.0f);
+        break;
+      case 8:
+        this.transform.position = new Vector3(-3.5f, 13.1f, -11.6f);
+        break;
+    }
+  }
+
+  private void Sp_ivan()
+  {
+  }
+
+  private void Sp_fog()
+  {
+  }
+
+  private void Sp_ran()
+  {
+  }
+
+  private void Sp_mido()
+  {
+  }
+
+  private void Critical(GameObject tag)
+  {
+    ++this.timer;
+    if (this.timer >= 60)
+    {
+      this.cam_mode = "nomal";
+      this.timer = 0;
+    }
+    Vector3 vector3 = new Vector3(tag.transform.position.x, tag.transform.position.y + 1f, tag.transform.position.z + 3f);
+    this.transform.rotation = new Quaternion(0.0f, 180f, 0.0f, 0.0f);
+    this.transform.position = vector3;
+  }
+}

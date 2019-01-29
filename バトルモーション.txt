@@ -1,0 +1,52 @@
+using UnityEngine;
+
+public class BattleMotion : MonoBehaviour
+{
+  public bool motionnomal = true;
+  public float motiontimer = 0.05f;
+  private string[] motion = new string[7]
+  {
+    "nomal",
+    "ATK",
+    "DEF",
+    "ENH",
+    "JAM",
+    "damage",
+    ""
+  };
+  private Animator anim;
+  private BattleturnManager batlemanage;
+  private int i;
+
+  private void Start()
+  {
+    this.anim = this.GetComponent<Animator>();
+    this.batlemanage = GameObject.Find("BattleManager").GetComponent<BattleturnManager>();
+  }
+
+  private void Update()
+  {
+    if (!this.batlemanage.batlend)
+    {
+      for (this.i = 0; this.i < 7; ++this.i)
+      {
+        for (int index = 0; index < 4; ++index)
+        {
+          if ((Object) this.batlemanage.ptmotion[index] != (Object) null && (double) this.batlemanage.ptmotion[this.batlemanage.comandmember].GetFloat(this.motion[this.i]) > 0.0)
+            this.batlemanage.ptmotion[this.batlemanage.comandmember].SetFloat(this.motion[this.i], this.batlemanage.ptmotion[this.batlemanage.comandmember].GetFloat(this.motion[this.i]) - Time.deltaTime);
+        }
+      }
+    }
+    else
+    {
+      for (this.i = 0; this.i < 7; ++this.i)
+      {
+        for (int index = 0; index < 4; ++index)
+        {
+          if ((Object) this.batlemanage.ptmotion[index] != (Object) null)
+            this.batlemanage.ptmotion[this.batlemanage.comandmember].SetFloat(this.motion[this.i], 0.0f);
+        }
+      }
+    }
+  }
+}

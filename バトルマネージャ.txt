@@ -1,0 +1,765 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class BattleturnManager : MonoBehaviour
+{
+  public List<int> enemytaglist = new List<int>();
+  public Animator[] ptmotion = new Animator[4];
+  public Color[] feeda = new Color[2];
+  public int feedtime = 0;
+  private bool batlle_end_effect = false;
+  private int ethertime = 0;
+  private bool[] dead = new bool[4];
+  private bool[] enemydead = new bool[3];
+  private bool fanfalle_start = false;
+  private int lose = 0;
+  private bool levelup = true;
+  private bool winflag = false;
+  public bool batlend = false;
+  private bool sekilup = false;
+  private int los = 0;
+  public bool loop = false;
+  private int twinatack = 0;
+  private bool twinflag = true;
+  private int[] turncount = new int[4];
+  private int condition_flag = 0;
+  private int party_count = 0;
+  private bool[] dropflag = new bool[3];
+  private int drop = 0;
+  private int dropnext = 0;
+  private int[] dropitem = new int[3];
+  public EnemyStetus.enemySt[] enemyCopy_ = new EnemyStetus.enemySt[3];
+  public string[] command_chara = new string[4]
+  {
+    "",
+    "",
+    "",
+    ""
+  };
+  public int getexp = 0;
+  public int getmony = 0;
+  private int waitime = 0;
+  private int inputtimer = 0;
+  public int select_mode = 0;
+  public int select_chara_ID = 0;
+  public int selectaction = 0;
+  public int select_skill = 0;
+  public int turnwait = 0;
+  private string[] dropgettext = new string[3]{ "", "", "" };
+  private int[] enemy_actionID = new int[2];
+  public AudioClip fanfalle;
+  public Camera maincam;
+  public int listlenght;
+  private AudioSource BGM;
+  private SystemMenu system;
+  private BattleCam batlecam;
+  private SkillMenu skillmenu;
+  private MenuOpen menuopen;
+  private ItemList itemlis;
+  private Playerturn_skilleffect PTskill;
+  private EnemySkills enemy_battleID;
+  private ItemMenuOpen itemenuopen;
+  private Enemyrturn_skilleffect enemuskill;
+  private ConditionController conditionparticle;
+  public Vector3[] enemypos;
+  public Vector3[] partypos;
+  public GameObject enemymarkar;
+  public GameObject Dropobj;
+  private Vector3 markarpos;
+  public Image feed;
+  public bool[] comandflag;
+  public int comandmember;
+  public int n;
+  public int enemyID_;
+  private int t;
+  private EncountDate encout;
+  public Image[] ATBbar;
+  public GameObject[] enemyID_Buton;
+  public Text[] enemynametxt;
+  public GameObject[] PartyModel;
+  public GameObject[] EnemyModel;
+  private float dexall;
+  private PartyStetus GM;
+  public Button[] atkbutton;
+  public Button[] skillvutton;
+  public Button[] itembutton;
+  public GameObject[] ATBbar_party;
+  public Image Draive;
+  public GameObject DrivegageAll;
+  public GameObject[] battlefields;
+  public GameObject[] PlayerChoiseBotton;
+  public Text ATKskillpanel;
+  public Text DEFskillpanel;
+  public Text ENHskillpanel;
+  public Text JAMskillpanel;
+  public Text Drivepanel;
+  public GameObject[] GUI_party;
+  public GameObject[] HPMPGUI_party;
+  public GameObject[] CommandPanel_party;
+  public GameObject SkillPanel;
+  public GameObject DriveBottun;
+  public Text Info;
+  public GameObject damtext;
+  private int i;
+  private int j;
+  private int damage;
+  private int memberturn;
+  private int wait;
+  public bool talking;
+  public int hubukislow_counter;
+  public float damtext_pos;
+  private int selectenemy;
+
+  private void Start()
+  {
+    this.feeda[0].r = this.feeda[0].g = this.feeda[0].b = this.feeda[0].a = (float) byte.MaxValue;
+    this.feeda[1] = this.feeda[0];
+    this.feeda[0].a = 0.0f;
+    this.winflag = false;
+    this.drop = 0;
+    this.menuopen = GameObject.Find("GameManager").GetComponent<MenuOpen>();
+    this.skillmenu = GameObject.Find("GameManager").GetComponent<SkillMenu>();
+    this.GM = GameObject.Find("GameManager").GetComponent<PartyStetus>();
+    this.PTskill = this.GetComponent<Playerturn_skilleffect>();
+    this.itemlis = GameObject.Find("GameManager").GetComponent<ItemList>();
+    this.enemuskill = this.GetComponent<Enemyrturn_skilleffect>();
+    this.encout = GameObject.Find("GameManager").GetComponent<EncountDate>();
+    this.system = GameObject.Find("GameManager").GetComponent<SystemMenu>();
+    this.itemenuopen = this.GetComponent<ItemMenuOpen>();
+    this.batlecam = this.maincam.GetComponent<BattleCam>();
+    this.conditionparticle = this.GetComponent<ConditionController>();
+    this.BGM = this.GetComponent<AudioSource>();
+    Object.Instantiate<GameObject>(this.battlefields[this.menuopen.battleID]);
+    for (this.i = 0; this.i < 3; ++this.i)
+    {
+      if ((Object) this.encout.enemySt[this.i] != (Object) null)
+      {
+        this.enemyCopy_[this.i].level = this.encout.enemySt[this.i].level;
+        this.enemyCopy_[this.i].name = this.encout.enemySt[this.i].name;
+        this.enemyCopy_[this.i].HP = this.encout.enemySt[this.i].HP;
+        this.enemyCopy_[this.i].maxHP = this.encout.enemySt[this.i].maxHP;
+        this.enemyCopy_[this.i].power = this.encout.enemySt[this.i].power;
+        this.enemyCopy_[this.i].INT = this.encout.enemySt[this.i].INT;
+        this.enemyCopy_[this.i].damagecut = this.encout.enemySt[this.i].damagecut;
+        this.enemyCopy_[this.i].magiccut = this.encout.enemySt[this.i].magiccut;
+        this.enemyCopy_[this.i].firecut = this.encout.enemySt[this.i].firecut;
+        this.enemyCopy_[this.i].icecut = this.encout.enemySt[this.i].icecut;
+        this.enemyCopy_[this.i].shinecut = this.encout.enemySt[this.i].shinecut;
+        this.enemyCopy_[this.i].darkcut = this.encout.enemySt[this.i].darkcut;
+        this.enemyCopy_[this.i].condition_pos = this.encout.enemySt[this.i].condition_pos;
+        this.enemyCopy_[this.i].condition_pri = this.encout.enemySt[this.i].condition_pri;
+        this.enemyCopy_[this.i].condition_charm = this.encout.enemySt[this.i].condition_charm;
+        this.enemyCopy_[this.i].condition_bri = this.encout.enemySt[this.i].condition_bri;
+        this.enemyCopy_[this.i].condition_slep = this.encout.enemySt[this.i].condition_slep;
+        this.enemyCopy_[this.i].condition_yakedo = this.encout.enemySt[this.i].condition_yakedo;
+        this.enemyCopy_[this.i].condition_zonbi = this.encout.enemySt[this.i].condition_zonbi;
+        this.enemyCopy_[this.i].emnemymodel = this.encout.enemySt[this.i].emnemymodel;
+        this.enemyCopy_[this.i].dex = this.encout.enemySt[this.i].dex;
+        this.enemyCopy_[this.i].dropitem = this.encout.enemySt[this.i].dropitem;
+        this.enemyCopy_[this.i].dropup = this.encout.enemySt[this.i].dropup;
+        this.enemyCopy_[this.i].use_skillID = this.encout.enemySt[this.i].use_skillID;
+        this.enemyCopy_[this.i].enemydiscription = this.encout.enemySt[this.i].enemydiscription;
+        this.dexall += this.enemyCopy_[this.i].dex;
+        this.enemynametxt[this.i].text = this.enemyCopy_[this.i].name;
+        this.getexp += this.encout.enemySt[this.i].getEXP;
+        this.getmony += this.encout.enemySt[this.i].getmoney;
+        if (this.enemyCopy_[this.i].HP > 0)
+        {
+          GameObject gameObject = Object.Instantiate<GameObject>(this.enemyCopy_[this.i].emnemymodel);
+          gameObject.name = "enemy" + (object) this.i;
+          gameObject.transform.position = this.enemypos[this.i];
+          this.enemy_battleID = GameObject.Find("enemy" + (object) this.i).GetComponent<EnemySkills>();
+          this.enemy_battleID.enemyNo = this.i;
+          this.enemytaglist.Add(this.i);
+          ++this.listlenght;
+        }
+      }
+    }
+    for (this.i = 0; this.i < 4; ++this.i)
+    {
+      if (this.menuopen.charpartyflag[this.i])
+      {
+        this.PartyModel[this.i].SetActive(true);
+        this.partypos[this.i] = this.PartyModel[this.i].transform.position;
+        this.ptmotion[this.i] = this.PartyModel[this.i].GetComponent<Animator>();
+        this.dexall += this.GM.partystatus[this.i].dex;
+      }
+    }
+    this.dexall *= 2f;
+    this.n = this.menuopen.returnscene;
+    this.BGM.clip = this.system.batlleBGM_sound;
+    this.BGM.Play();
+    this.menuopen.menuID = -2;
+    this.itemlis.itemmenuID = 0;
+    this.menuopen.battle = true;
+  }
+
+  private void Update()
+  {
+    if (this.talking)
+      return;
+    if (this.enemyCopy_[0].HP > 0 || this.enemyCopy_[1].HP > 0 || this.enemyCopy_[2].HP > 0)
+    {
+      ++this.wait;
+      ++this.inputtimer;
+      this.Draive.fillAmount = this.GM.Drivegage;
+      this.ConditionCaunter();
+      this.PartyMember_Stetas_Flag();
+      if (this.wait >= 20)
+        this.EnemrMarkar();
+      this.Enemy_Stetas_Flag();
+    }
+    if (this.enemyCopy_[0].HP <= 0 && this.enemyCopy_[1].HP <= 0 && this.enemyCopy_[2].HP <= 0)
+    {
+      ++this.feedtime;
+      this.DrivegageAll.SetActive(false);
+      for (this.i = 0; this.i < 4; ++this.i)
+      {
+        this.CommandPanel_party[this.i].SetActive(false);
+        this.GUI_party[this.i].SetActive(false);
+        this.SkillPanel.SetActive(false);
+        if (this.menuopen.charpartyflag[this.i] && this.GM.partystatus[this.i].HP <= 0)
+          this.GM.partystatus[this.i].HP = 1;
+      }
+      if (this.feedtime < 300)
+      {
+        if (this.menuopen.Bossbatlle)
+        {
+          if (this.feedtime >= 0 && this.feedtime < 10 || this.feedtime >= 50 && this.feedtime < 60 || (this.feedtime >= 100 && this.feedtime < 110 || this.feedtime >= 150 && this.feedtime < 160) || this.feedtime >= 200 && this.feedtime < 210)
+            this.feed.color = this.feeda[1];
+          else
+            this.feed.color = this.feeda[0];
+        }
+        else if (!this.batlle_end_effect)
+        {
+          this.feedtime = 250;
+          this.batlle_end_effect = true;
+        }
+      }
+      else
+      {
+        this.batlend = true;
+        this.WinFlag();
+      }
+    }
+  }
+
+  public void OnClickDemo(int no)
+  {
+    int power = this.GM.partystatus[no].power;
+    if (this.turnwait > 0)
+      this.StartCoroutine("waitTurnBreak");
+    this.ptmotion[no].SetFloat("nomal", 3f);
+    ++this.turnwait;
+    this.PTskill.partycle = (GameObject) UnityEngine.Resources.Load("particle/AttackHit");
+    int num1 = Random.Range((int) (-(double) power * 0.100000001490116), power);
+    int num2 = power + num1;
+    if (num1 == num2)
+    {
+      this.batlecam.cam_mode = "critical";
+      this.batlecam.target = this.PartyModel[no];
+      this.Info.text = this.GM.partystatus[no].name + "は" + (object) num2 + "のダメージを与えた";
+    }
+    this.PTskill.AllorSolo(0, 0, 0, this.enemyCopy_[0].damagecut, this.enemyCopy_[1].damagecut, this.enemyCopy_[2].damagecut, 0, this.enemyCopy_[this.enemyID_].damagecut, (float) num2, 0);
+    this.twinatack = Random.Range(0, 100);
+    if (this.twinflag && this.twinatack >= 80)
+    {
+      this.getexp = (int) ((double) this.getexp * 1.10000002384186);
+      this.OnClickDemo(no);
+      this.twinflag = false;
+    }
+    this.comandflag[no] = false;
+    this.CommandPanel_party[no].SetActive(false);
+    this.ATBbar_party[no].GetComponent<Image>().fillAmount = 0.0f;
+    if (this.loop)
+    {
+      this.GM.Drivegage -= 0.2f;
+      if ((double) this.GM.Drivegage <= 0.0)
+      {
+        this.GM.Drivegage = 0.0f;
+        this.loop = false;
+      }
+    }
+    else
+      this.GM.Drivegage += 0.1f;
+    this.twinflag = true;
+    this.select_mode = 0;
+    this.selectaction = 0;
+    this.SkillPanel.SetActive(false);
+    --this.turnwait;
+  }
+
+  public void SkillCommand()
+  {
+    this.waitime = 0;
+    this.select_skill = 0;
+    if (!this.SkillPanel.active)
+    {
+      this.SkillPanel.SetActive(true);
+      this.ATKskillpanel.text = "" + this.skillmenu.charskilllist[this.comandmember].ATKSkillname[this.skillmenu.setskill_atk[this.comandmember]];
+      this.DEFskillpanel.text = "" + this.skillmenu.charskilllist[this.comandmember].DEFSkillname[this.skillmenu.setskill_def[this.comandmember]];
+      this.ENHskillpanel.text = "" + this.skillmenu.charskilllist[this.comandmember].ENHSkillname[this.skillmenu.setskill_enh[this.comandmember]];
+      this.JAMskillpanel.text = "" + this.skillmenu.charskilllist[this.comandmember].JAMSkillname[this.skillmenu.setskill_jam[this.comandmember]];
+      if ((double) this.Draive.fillAmount == 1.0)
+      {
+        this.DriveBottun.SetActive(true);
+        this.Drivepanel.text = "" + this.skillmenu.special[this.comandmember];
+      }
+      else
+        this.DriveBottun.SetActive(false);
+      this.select_mode = 2;
+    }
+    else
+      this.SkillPanel.SetActive(false);
+  }
+
+  public void Enemy_Stetas_Flag()
+  {
+    for (this.i = 0; this.i < 3; ++this.i)
+    {
+      if (this.enemyID_ == this.i)
+        this.ATBbar[this.i].color = new Color(0.64f, 0.0f, 0.0f);
+      else
+        this.ATBbar[this.i].color = new Color(0.0f, 0.64f, 0.64f);
+      if (this.enemyCopy_[this.i].HP > 0)
+      {
+        if (!this.loop)
+        {
+          if ((double) this.ATBbar[this.i].fillAmount < 1.0)
+          {
+            if (!this.loop)
+              this.ATBbar[this.i].fillAmount += Time.deltaTime * this.enemyCopy_[this.i].dex / this.dexall;
+          }
+          else
+          {
+            if (this.enemyCopy_[this.i].charm_ <= 0 && this.enemyCopy_[this.i].pri_ <= 0 && this.enemyCopy_[this.i].slep_ <= 0)
+            {
+              if (this.turnwait > 0)
+                this.StartCoroutine("waitTurnBreak");
+              ++this.turnwait;
+              this.enemuskill.Targetdamage(this.enemyCopy_[this.i], this.enemyCopy_[this.i].use_skillID[Random.Range(0, this.enemyCopy_[this.i].use_skillID.Length)], this.i);
+            }
+            else
+              this.Info.text = this.enemyCopy_[this.i].name + "は動けない";
+            this.Enemyconditioncount(this.i);
+            this.ATBbar[this.i].fillAmount = 0.0f;
+          }
+        }
+      }
+      else if (!this.enemydead[this.i])
+      {
+        this.drop = Random.Range(1, 100);
+        if (this.drop <= this.enemyCopy_[this.i].dropup)
+        {
+          this.dropflag[this.i] = true;
+          Object.Instantiate<GameObject>(this.Dropobj).transform.position = new Vector3(this.enemypos[this.i].x, this.enemypos[this.i].y + 3f, this.enemypos[this.i].z);
+        }
+        this.selectenemy = 0;
+        this.listlenght = 0;
+        this.enemytaglist.Clear();
+        for (int index = 0; index < 3; ++index)
+        {
+          if (this.enemyCopy_[index].HP > 0)
+          {
+            ++this.listlenght;
+            this.enemytaglist.Add(index);
+          }
+        }
+        this.enemyID_ = this.enemytaglist[0];
+        this.enemyID_Buton[this.i].SetActive(false);
+        this.enemydead[this.i] = true;
+      }
+    }
+  }
+
+  public void PartyMember_Stetas_Flag()
+  {
+    this.CommandActive();
+    for (this.memberturn = 0; this.memberturn < 4; ++this.memberturn)
+    {
+      if (this.menuopen.charpartyflag[this.memberturn])
+      {
+        this.GUI_party[this.memberturn].SetActive(true);
+        this.HPMPGUI_party[this.memberturn].GetComponent<Text>().text = this.GM.partystatus[this.memberturn].name + "\nHP " + (object) this.GM.partystatus[this.memberturn].HP + " / " + (object) this.GM.partystatus[this.memberturn].maxHP + "\nMP " + (object) this.GM.partystatus[this.memberturn].MP + " / " + (object) this.GM.partystatus[this.memberturn].maxMP;
+        if (this.GM.partystatus[this.memberturn].HP > 0)
+        {
+          this.PartyModel[this.memberturn].transform.rotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
+          if ((double) this.ATBbar_party[this.memberturn].GetComponent<Image>().fillAmount != 1.0)
+          {
+            if (!this.loop)
+            {
+              this.PlayerChoiseBotton[this.memberturn].SetActive(false);
+              this.turncount[this.memberturn] = 1;
+              this.ATBbar_party[this.memberturn].GetComponent<Image>().color = new Color(0.64f, 0.0f, 0.0f);
+              this.ATBbar_party[this.memberturn].GetComponent<Image>().fillAmount += Time.deltaTime * (this.GM.partystatus[this.memberturn].dex + (float) this.PTskill.dexupturn) / this.dexall;
+            }
+            else
+              this.ATBbar_party[this.memberturn].GetComponent<Image>().fillAmount = 1f;
+          }
+          else
+          {
+            this.PlayerChoiseBotton[this.memberturn].SetActive(true);
+            this.ATBbar_party[this.memberturn].GetComponent<Image>().color = new Color(0.0f, 0.64f, 0.64f);
+            if (this.turncount[this.memberturn] == 1)
+              this.TurnCounter(this.memberturn);
+          }
+          if ((double) this.Draive.fillAmount == 1.0)
+            this.Draive.color = new Color(0.0f, 0.64f, 0.64f);
+        }
+        else if (!this.dead[this.memberturn])
+        {
+          this.ptmotion[this.memberturn].SetBool("dead", true);
+          this.PlayerChoiseBotton[this.memberturn].SetActive(false);
+          this.SkillPanel.SetActive(false);
+          this.comandflag[this.memberturn] = false;
+          if (this.memberturn == 1)
+          {
+            if (this.GM.Andead > 0)
+            {
+              this.PTskill.partycle = (GameObject) UnityEngine.Resources.Load("particle/Ritual");
+              this.GM.Andead = 0;
+              this.conditionparticle.Destroyparticle(1);
+            }
+            this.PTskill.kikyou = 0;
+          }
+          this.dead[this.memberturn] = true;
+        }
+      }
+      else
+      {
+        this.comandflag[this.memberturn] = false;
+        this.GUI_party[this.memberturn].SetActive(false);
+      }
+    }
+    this.los = 0;
+    while (this.los < 4 && (!this.menuopen.charpartyflag[this.los] || this.GM.partystatus[this.los].HP <= 0))
+      ++this.los;
+    if (this.los < 3)
+      return;
+    this.batlecam.cam_mode = "lose";
+    this.LoseFlag();
+  }
+
+  public void ConditionCaunter()
+  {
+    this.Draive.fillAmount = this.GM.Drivegage;
+    if (this.GM.passion > 0 && this.GM.passion % 10 == 0 && this.GM.partystatus[this.memberturn].HP > 0)
+    {
+      this.GM.partystatus[this.memberturn].MP += this.GM.partystatus[0].MP * 3 / 5 * this.GM.partystatus[this.memberturn].level;
+      this.GM.partystatus[this.memberturn].HP += this.GM.partystatus[0].MP * 3 / 5 * this.GM.partystatus[this.memberturn].level;
+      this.DamageTextpop(this.GM.partystatus[0].MP * 3 / 5 * this.GM.partystatus[this.memberturn].level, 5, this.memberturn);
+    }
+    if (this.GM.yellcount > 0)
+      --this.GM.yellcount;
+    if (this.GM.Andead > 0)
+      --this.GM.Andead;
+    if (this.PTskill.hubukislow)
+      ++this.hubukislow_counter;
+    if (this.hubukislow_counter >= 300)
+    {
+      for (this.i = 0; this.i < 3; ++this.i)
+        this.ATBbar[this.i].GetComponent<Image>().fillAmount -= 0.3f;
+      this.hubukislow_counter = 0;
+      this.PTskill.hubukislow = false;
+    }
+    ++this.ethertime;
+    if (this.GM.ether > 0 && this.ethertime == 100)
+    {
+      this.GM.partystatus[2].MP += 30;
+      this.ethertime = 0;
+    }
+    if (this.GM.ether <= 0 && this.conditionparticle.charbuffoff[2])
+      this.conditionparticle.Destroyparticle(2);
+    if (this.PTskill.dexupturn > 0)
+      --this.PTskill.dexupturn;
+    for (this.i = 0; this.i < 4; ++this.i)
+    {
+      if (this.GM.partystatus[this.i].condition_pos > 0)
+      {
+        --this.GM.partystatus[this.i].condition_pos;
+        if (this.GM.partystatus[this.i].condition_pos % 100 == 0)
+          this.GM.partystatus[this.i].HP -= 10;
+      }
+      if (this.GM.partystatus[this.i].condition_pri > 0)
+        --this.GM.partystatus[this.i].condition_pri;
+      if (this.GM.partystatus[this.i].condition_sleeep > 0)
+        --this.GM.partystatus[this.i].condition_sleeep;
+      if (this.GM.partystatus[this.i].condition_charm > 0)
+        --this.GM.partystatus[this.i].condition_charm;
+      if (this.GM.partystatus[this.i].condition_yakedo > 0)
+      {
+        --this.GM.partystatus[this.i].condition_yakedo;
+        if (this.GM.partystatus[this.i].condition_yakedo % 100 == 0)
+          this.GM.partystatus[this.i].HP -= this.GM.partystatus[this.i].maxHP / 10;
+      }
+      if (this.GM.partystatus[this.i].condition_brin > 0)
+        --this.GM.partystatus[this.i].condition_brin;
+      this.conditionparticle.Destroyparticle(this.i);
+    }
+  }
+
+  public void CommandActive()
+  {
+    for (this.i = 0; this.i < 4; ++this.i)
+    {
+      if (this.comandflag[this.i])
+        this.CommandPanel_party[this.i].SetActive(true);
+      else
+        this.CommandPanel_party[this.i].SetActive(false);
+    }
+  }
+
+  public void LoseFlag()
+  {
+    this.Info.GetComponent<Text>().text = "全滅した……";
+    ++this.lose;
+    if (this.lose < 200)
+      return;
+    this.menuopen.battle = false;
+    SceneManager.LoadScene("Losemode");
+  }
+
+  public void Escape()
+  {
+    this.menuopen.battle = false;
+    for (this.i = 0; this.i < 4; ++this.i)
+    {
+      this.GM.passion = 0;
+      this.PTskill.sumire_count[this.i] = 0;
+    }
+    this.menuopen.menuID = 0;
+    this.winflag = true;
+    SceneManager.LoadScene(this.n);
+  }
+
+  public void WinFlag()
+  {
+    if (!this.fanfalle_start)
+    {
+      this.BGM.clip = this.fanfalle;
+      this.BGM.Play();
+      for (this.i = 0; this.i < 3; ++this.i)
+        this.enemyID_Buton[this.i].SetActive(false);
+      this.fanfalle_start = true;
+    }
+    this.batlecam.cam_mode = "end";
+    if (this.winflag)
+      return;
+    ++this.t;
+    if (this.t < 200)
+      this.Info.text = this.getexp.ToString() + "の経験値を手に入れた";
+    else if (this.t < 400)
+    {
+      if (this.dropnext == 0)
+      {
+        for (this.i = 0; this.i < 3; ++this.i)
+        {
+          if (this.dropflag[this.i])
+          {
+            ++this.itemlis.itemhave_mat[this.enemyCopy_[0].dropitem];
+            this.dropgettext[this.i] = this.itemlis.itemname_mat[this.enemyCopy_[this.i].dropitem] + "を手に入れた\n";
+          }
+        }
+        this.dropnext = 1;
+      }
+      else
+        this.Info.text = this.dropgettext[0] + this.dropgettext[1] + this.dropgettext[2];
+    }
+    else if (this.t < 500)
+    {
+      this.Info.text = "";
+      if (this.levelup)
+      {
+        for (this.i = 0; this.i < 4; ++this.i)
+        {
+          if (this.menuopen.charpartyflag[this.i])
+          {
+            this.skillmenu.skillpoint[this.i] += this.getexp / 10;
+            this.GM.partystatus[this.i].haveexp += this.getexp;
+          }
+          else
+          {
+            this.skillmenu.skillpoint[this.i] += this.getexp / 20;
+            this.GM.partystatus[this.i].haveexp += this.getexp / 2;
+          }
+        }
+        this.levelup = false;
+      }
+      this.Levelup();
+    }
+    else
+    {
+      this.menuopen.Bossbatlle = false;
+      this.menuopen.battle = false;
+      this.menuopen.menuID = 0;
+      this.winflag = true;
+      this.menuopen.money += this.getmony;
+      SceneManager.LoadScene(this.n);
+    }
+  }
+
+  public void Levelup()
+  {
+    Quaternion rotation = Quaternion.Euler(180f, 0.0f, 180f);
+    GameObject original = (GameObject) UnityEngine.Resources.Load("particle/levelup");
+    for (this.j = 0; this.j < 4; ++this.j)
+    {
+      if (this.menuopen.charpartyflag[this.j])
+      {
+        while (this.GM.partystatus[this.j].haveexp >= this.GM.partystatus[this.j].needexp && this.GM.partystatus[this.j].level < 100)
+        {
+          Object.Destroy((Object) Object.Instantiate<GameObject>(original, this.PartyModel[this.j].transform.position, rotation), 1f);
+          this.GM.partystatus[this.j].haveexp -= this.GM.partystatus[this.j].needexp;
+          ++this.GM.partystatus[this.j].level;
+          this.GM.partystatus[this.j].HP = 99999;
+          this.GM.partystatus[this.j].MP = 99999;
+        }
+      }
+    }
+  }
+
+  public void TurnCounter(int partynum)
+  {
+    if (this.GM.partystatus[partynum].condition_pri > 0)
+    {
+      this.condition_flag = Random.Range(0, 2);
+      if (this.condition_flag == 1)
+      {
+        this.Info.text = "麻痺で動けない";
+        this.ATBbar_party[partynum].GetComponent<Image>().fillAmount = 0.0f;
+        this.comandflag[partynum] = false;
+      }
+    }
+    if (this.GM.partystatus[partynum].condition_sleeep > 0)
+    {
+      this.Info.GetComponent<Text>().text = "眠っている";
+      this.ATBbar_party[partynum].GetComponent<Image>().fillAmount = 0.0f;
+      this.comandflag[partynum] = false;
+    }
+    if (this.GM.partystatus[partynum].condition_charm > 0)
+    {
+      this.condition_flag = Random.Range(0, 2);
+      if (this.condition_flag == 1)
+      {
+        this.Info.text = "魅了されて攻撃できない";
+        this.ATBbar_party[partynum].GetComponent<Image>().fillAmount = 0.0f;
+        this.comandflag[partynum] = false;
+      }
+    }
+    this.turncount[partynum] = 0;
+  }
+
+  public void Enemyconditioncount(int i)
+  {
+    --this.enemyCopy_[i].pos_;
+    --this.enemyCopy_[i].pri_;
+    --this.enemyCopy_[i].slep_;
+    --this.enemyCopy_[i].charm_;
+    --this.enemyCopy_[i].bri_;
+  }
+
+  public void ComandOn_Off(int no)
+  {
+    this.waitime = 0;
+    for (this.i = 0; this.i < 4; ++this.i)
+      this.comandflag[this.i] = false;
+    this.comandmember = no;
+    this.SkillPanel.SetActive(false);
+    this.comandflag[no] = true;
+  }
+
+  public void DamageTextpop(int damage_, int mode, int count)
+  {
+    switch (mode)
+    {
+      case 0:
+        if (this.enemyCopy_[count].HP <= 0)
+          break;
+        this.damtext_pos = Random.Range(-1f, 1f);
+        Vector3 vector3_1 = new Vector3(this.enemypos[count].x + this.damtext_pos, 6f, 9f - this.damtext_pos);
+        GameObject gameObject1 = Object.Instantiate<GameObject>(this.damtext);
+        gameObject1.transform.position = vector3_1;
+        gameObject1.GetComponent<TextMesh>().text = damage_.ToString();
+        Object.Destroy((Object) gameObject1, 1f);
+        break;
+      case 2:
+        Vector3 position1 = this.PartyModel[count].transform.position;
+        position1.z += 10f;
+        GameObject gameObject2 = Object.Instantiate<GameObject>(this.damtext);
+        gameObject2.transform.position = position1;
+        gameObject2.GetComponent<TextMesh>().text = damage_.ToString();
+        Object.Destroy((Object) gameObject2, 1f);
+        ++this.party_count;
+        if (this.party_count != 3)
+          break;
+        this.party_count = 0;
+        break;
+      case 3:
+        Vector3 position2 = this.PartyModel[count].transform.position;
+        GameObject gameObject3 = Object.Instantiate<GameObject>(this.damtext);
+        gameObject3.transform.position = position2;
+        gameObject3.GetComponent<TextMesh>().text = damage_.ToString();
+        Object.Destroy((Object) gameObject3, 1f);
+        ++this.party_count;
+        if (this.party_count != 3)
+          break;
+        this.party_count = 0;
+        break;
+      case 4:
+        this.damtext_pos = Random.Range(-1f, 1f);
+        Vector3 vector3_2 = new Vector3(this.HPMPGUI_party[this.memberturn].transform.position.x + this.damtext_pos, 6f, 9f - this.damtext_pos);
+        GameObject gameObject4 = Object.Instantiate<GameObject>(this.damtext);
+        gameObject4.transform.position = vector3_2;
+        gameObject4.GetComponent<TextMesh>().text = damage_.ToString();
+        Object.Destroy((Object) gameObject4, 1f);
+        break;
+      case 5:
+        this.damtext_pos = Random.Range(-1f, 1f);
+        Vector3 vector3_3 = new Vector3(this.HPMPGUI_party[this.memberturn].transform.position.x + this.damtext_pos, 6f, 9f - this.damtext_pos);
+        GameObject gameObject5 = Object.Instantiate<GameObject>(this.damtext);
+        gameObject5.transform.position = vector3_3;
+        gameObject5.GetComponent<TextMesh>().text = damage_.ToString();
+        Object.Destroy((Object) gameObject5, 1f);
+        break;
+    }
+  }
+
+  public void EnemrMarkar()
+  {
+    if (this.inputtimer < 50)
+      return;
+    if ((double) Input.GetAxis("Vertical") > 0.0 && this.selectenemy < this.listlenght - 1)
+    {
+      this.inputtimer = 0;
+      ++this.selectenemy;
+    }
+    else if ((double) Input.GetAxis("Vertical") < 0.0 && this.selectenemy > 0)
+    {
+      this.inputtimer = 0;
+      --this.selectenemy;
+    }
+    this.enemyID_ = this.enemytaglist[this.selectenemy];
+    if (this.enemyCopy_[this.enemyID_].HP > 0)
+    {
+      this.markarpos = this.enemypos[this.enemyID_];
+      this.markarpos.y = 8f;
+      this.enemymarkar.transform.position = this.markarpos;
+    }
+    else
+      this.enemyID_ = this.enemytaglist[0];
+  }
+
+  [DebuggerHidden]
+  private IEnumerator waitTurnBreak()
+  {
+    // ISSUE: object of a compiler-generated type is created
+    return (IEnumerator) new BattleturnManager.\u003CwaitTurnBreak\u003Ec__Iterator0()
+    {
+      \u0024this = this
+    };
+  }
+}

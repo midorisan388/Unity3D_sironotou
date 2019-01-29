@@ -1,0 +1,49 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class NPC_talkmes : MonoBehaviour
+{
+  private MenuOpen menu;
+  public Image NPCmescanvas;
+  public Text mes_settext;
+  [Multiline]
+  public string npc_messege;
+  private string textmessege;
+  private int i;
+
+  private void Start()
+  {
+    this.menu = GameObject.Find("GameManager").GetComponent<MenuOpen>();
+  }
+
+  private void OnTriggerEnter(Collider other)
+  {
+    if (other.tag == "Player" && !this.menu.talkflag)
+    {
+      this.TalkSet();
+    }
+    else
+    {
+      this.textmessege = "";
+      this.mes_settext.enabled = false;
+      this.NPCmescanvas.enabled = false;
+    }
+  }
+
+  public void TalkSet()
+  {
+    this.NPCmescanvas.enabled = true;
+    this.textmessege = this.npc_messege;
+    this.mes_settext.text = this.textmessege;
+    this.mes_settext.enabled = true;
+  }
+
+  private void OnTriggerExit(Collider other)
+  {
+    if (!(other.tag == "Player"))
+      return;
+    this.textmessege = "";
+    this.mes_settext.enabled = false;
+    this.NPCmescanvas.enabled = false;
+  }
+}
